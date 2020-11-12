@@ -1,0 +1,98 @@
+{
+  "name": "coding-hbuilderx",
+  "description": "your extension description",
+  "displayName": "your extension display name",
+  "version": "0.0.0",
+  "publisher": "your name",
+  "engines": {
+    "HBuilderX": "^2.7.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension",
+  "activationEvents": [
+    "onCommand:codingPlugin.helloWorld",
+    "onView:codingPlugin.tree",
+    "onView:codingPlugin.webview"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "codingPlugin.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "codingPlugin.treeItemClick",
+        "title": "Click Tree Item"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codingPlugin.helloWorld",
+          "group": "z_commands",
+          "when": "editorTextFocus"
+        },
+        {
+          "group": "z_commands"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "CODING",
+          "title": "CODING"
+        }
+      ],
+      "rightside": [
+        {
+          "id": "WebviewContainerId",
+          "title": "WEBVIEW"
+        }
+      ]
+    },
+    "views": {
+      "CODING": [
+        {
+          "id": "codingPlugin.tree",
+          "name": "CODING"
+        }
+      ],
+      "WebviewContainerId": [
+        {
+          "id": "codingPlugin.webview",
+          "title": "WEBVIEW"
+        }
+      ]
+    }
+  },
+  "extensionDependencies": [
+    "plugin-manager"
+  ],
+  "scripts": {
+    "watch": "npm-run-all -p watch:*",
+    "watch:extension": "tsc --watch -p ./src",
+    "watch:webviews": "webpack --watch --mode development"
+  },
+  "dependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.7",
+    "@types/react": "^16.9.56",
+    "@types/react-dom": "^16.9.9",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
+    "css-loader": "^5.0.1",
+    "eslint": "^7.13.0",
+    "npm-run-all": "^4.1.5",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^8.0.11",
+    "typescript": "^4.0.5",
+    "webpack": "^5.4.0",
+    "webpack-cli": "^4.2.0"
+  }
+}
