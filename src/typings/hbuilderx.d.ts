@@ -9,7 +9,8 @@ interface IContext {
   subscriptions: any[];
   ctx: {
     [key: string]: any;
-  }
+  },
+  [key: string]: any;
 }
 
 interface IWebviewPanel {
@@ -18,6 +19,6 @@ interface IWebviewPanel {
 }
 
 interface ITreeItem {
-  name: string;
+  name?: string;
   children?: ITreeItem[];
 }

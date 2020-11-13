@@ -1,8 +1,9 @@
 import hx from 'hbuilderx';
 
-class TreeDataProvider extends hx.TreeDataProvider {
-  constructor(treeData: ITreeItem[]) {
+class DepotTreeDataProvider extends hx.TreeDataProvider {
+  constructor(context: IContext, treeData: ITreeItem[]) {
     super();
+    this.context = context;
     this._treeData = treeData;
   }
 
@@ -30,4 +31,4 @@ class TreeDataProvider extends hx.TreeDataProvider {
   }
 }
 
-export default TreeDataProvider;
+export default DepotTreeDataProvider;

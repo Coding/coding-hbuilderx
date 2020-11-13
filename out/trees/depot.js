@@ -4,9 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const hbuilderx_1 = __importDefault(require("hbuilderx"));
-class TreeDataProvider extends hbuilderx_1.default.TreeDataProvider {
-    constructor(treeData) {
+class DepotTreeDataProvider extends hbuilderx_1.default.TreeDataProvider {
+    constructor(context, treeData) {
         super();
+        this.context = context;
         this._treeData = treeData;
     }
     getChildren(element) {
@@ -32,4 +33,4 @@ class TreeDataProvider extends hbuilderx_1.default.TreeDataProvider {
         };
     }
 }
-exports.default = TreeDataProvider;
+exports.default = DepotTreeDataProvider;

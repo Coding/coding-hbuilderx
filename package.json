@@ -13,7 +13,8 @@
   "main": "./out/extension",
   "activationEvents": [
     "onCommand:codingPlugin.helloWorld",
-    "onView:codingPlugin.tree",
+    "onView:codingPlugin.treeMR",
+    "onView:codingPlugin.treeDepot",
     "onView:codingPlugin.webview"
   ],
   "contributes": {
@@ -23,8 +24,8 @@
         "title": "Hello World"
       },
       {
-        "command": "codingPlugin.treeItemClick",
-        "title": "Click Tree Item"
+        "command": "codingPlugin.mrTreeItemClick",
+        "title": "Click MR Tree Item"
       }
     ],
     "menus": {
@@ -42,8 +43,12 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "CODING",
-          "title": "CODING"
+          "id": "CODING-MR",
+          "title": "CODING MR"
+        },
+        {
+          "id": "CODING-DEPOT",
+          "title": "CODING 仓库"
         }
       ],
       "rightside": [
@@ -54,10 +59,16 @@
       ]
     },
     "views": {
-      "CODING": [
+      "CODING-MR": [
         {
-          "id": "codingPlugin.tree",
-          "name": "CODING"
+          "id": "codingPlugin.treeMR",
+          "name": "CODING MR"
+        }
+      ],
+      "CODING-DEPOT": [
+        {
+          "id": "codingPlugin.treeDepot",
+          "name": "CODING 仓库"
         }
       ],
       "WebviewContainerId": [
@@ -77,6 +88,9 @@
     "watch:webviews": "webpack --watch --mode development"
   },
   "dependencies": {
+    "axios": "^0.21.0",
+    "got": "^11.8.0",
+    "isomorphic-git": "^1.8.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },

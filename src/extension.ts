@@ -1,19 +1,48 @@
-import hx from 'hbuilderx';
-import TreeDataProvider from './tree';
+import init from './init';
 import WebviewProvider from './webview';
-import { registerCommands } from './commands';
-import { treeData } from './constants/tree';
+import CodingServer from './services/codingServer';
+import { proxyCtx } from './utils/proxy';
 
-function activate(context: IContext) {
+async function activate(context: IContext) {
   const webviewProvider = new WebviewProvider();
-  const treeDataProvider = new TreeDataProvider(treeData);
+  const repoInfo = await CodingServer.getRepoParams();
+  console.log('repoInfo ==> ', repoInfo);
+
+  const codingServer = new CodingServer(
+    {
+      id: '123',
+      user: {
+        avatar: 'string',
+        global_key: 'string',
+        name: 'string',
+        path: 'string',
+        team: 'string'
+      },
+      accessToken: '1b7fca3bd7594a89b0f5e2a0250c1147',
+      refreshToken: 'abc'
+    },
+    repoInfo || {
+      team: 'codingcorp',
+      project: 'mo-test',
+      repo: 'mo-test'
+    }
+  );
+
+  let userInfo = null;
+  if (repoInfo) {
+    userInfo = await codingServer.getUserInfo(repoInfo.team);
+  }
 
   context.ctx = {
     webviewProvider,
-    treeDataProvider
+    codingServer,
+    repoInfo,
+    userInfo
   };
 
-  registerCommands(context);
+  proxyCtx(context);
+
+  init(context);
 }
 
 function deactivate() {
