@@ -30,6 +30,14 @@
       {
         "command": "codingPlugin.depotTreeItemClick",
         "title": "Click Depot Tree Item"
+      },
+      {
+        "command": "codingPlugin.createProjectAndDepot",
+        "title": "Create Project and Depot"
+      },
+      {
+        "command": "codingPlugin.createDepot",
+        "title": "Create Depot"
       }
     ],
     "menus": {
@@ -41,6 +49,12 @@
         },
         {
           "group": "z_commands"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "codingPlugin.createDepot",
+          "when": "viewItem == 'createDepot'"
         }
       ]
     },
@@ -93,8 +107,8 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
-    "got": "^11.8.0",
     "isomorphic-git": "^1.8.0",
+    "querystring": "^0.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },

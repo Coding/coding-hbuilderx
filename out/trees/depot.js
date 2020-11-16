@@ -13,6 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const hbuilderx_1 = __importDefault(require("hbuilderx"));
+const getCommand = (element) => {
+    if (element.children)
+        return '';
+    if (element._create)
+        return 'codingPlugin.createDepot';
+    return 'codingPlugin.depotTreeItemClick';
+};
 class DepotTreeDataProvider extends hbuilderx_1.default.TreeDataProvider {
     constructor(context) {
         super();
@@ -28,7 +35,7 @@ class DepotTreeDataProvider extends hbuilderx_1.default.TreeDataProvider {
                 return Promise.resolve([
                     {
                         name: '创建仓库',
-                        disableClick: true,
+                        _create: true,
                     },
                     {
                         name: '仓库列表',
@@ -46,9 +53,10 @@ class DepotTreeDataProvider extends hbuilderx_1.default.TreeDataProvider {
             label: element.name,
             collapsibleState: element.children ? 1 : 0,
             command: {
-                command: (element.children || element.disableClick) ? '' : 'codingPlugin.depotTreeItemClick',
+                command: getCommand(element),
                 arguments: element
-            }
+            },
+            contextValue: 'createDepot'
         };
     }
 }

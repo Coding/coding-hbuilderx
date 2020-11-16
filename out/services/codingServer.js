@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const hbuilderx_1 = __importDefault(require("hbuilderx"));
 const fs_1 = __importDefault(require("fs"));
+const querystring_1 = __importDefault(require("querystring"));
 const axios_1 = __importDefault(require("../utils/axios"));
 const isomorphic_git_1 = __importDefault(require("isomorphic-git"));
 const repo_1 = require("../utils/repo");
@@ -99,6 +100,34 @@ class CodingServer {
                     }
                 });
                 return ((_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.depots) || [];
+            }
+            catch (err) {
+                throw new Error(err);
+            }
+        });
+    }
+    createProjectAndDepot(team, payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return 'createProjectAndDepot';
+        });
+    }
+    createDepot(team = this._repo.team, project = this._repo.project, depot) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield axios_1.default({
+                    method: 'post',
+                    url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot?access_token=${this._session.accessToken}`,
+                    header: {
+                        'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    data: querystring_1.default.stringify({
+                        name: depot,
+                        vcsType: 'git',
+                        gitReadmeEnabled: false,
+                        shared: false
+                    })
+                });
+                console.log('result => ', result);
             }
             catch (err) {
                 throw new Error(err);

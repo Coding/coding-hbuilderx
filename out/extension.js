@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
+const hbuilderx_1 = __importDefault(require("hbuilderx"));
 const init_1 = __importDefault(require("./init"));
 const webview_1 = __importDefault(require("./webview"));
 const codingServer_1 = __importDefault(require("./services/codingServer"));
@@ -20,9 +21,14 @@ const proxy_1 = require("./utils/proxy");
 const accessToken = '1b7fca3bd7594a89b0f5e2a0250c1147';
 function activate(context) {
     return __awaiter(this, void 0, void 0, function* () {
+        // TODO: 认证，拿到用户信息
         const webviewProvider = new webview_1.default();
         const repoInfo = yield codingServer_1.default.getRepoParams();
         console.log('repoInfo ==> ', repoInfo);
+        if (!repoInfo) {
+            hbuilderx_1.default.window.showWarningMessage('workspace中没有CODING的代码仓库');
+            return;
+        }
         const codingServer = new codingServer_1.default({
             id: '123',
             user: {

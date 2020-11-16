@@ -1,5 +1,6 @@
 import hx from 'hbuilderx';
 import fs from 'fs';
+import qs from 'querystring';
 import axios from '../utils/axios';
 import git from 'isomorphic-git';
 import { IRepoInfo, ISessionData } from '../typings/common';
@@ -88,6 +89,31 @@ export default class CodingServer {
         }
       });
       return result?.data?.depots || [];
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
+  async createProjectAndDepot(team: string, payload: { project: string, depot: string }) {
+    return 'createProjectAndDepot';
+  }
+
+  async createDepot(team: string = this._repo.team, project: string = this._repo.project, depot: string) {
+    try {
+      const result = await axios({
+        method: 'post',
+        url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot?access_token=${this._session.accessToken}`,
+        header: {
+          'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        data: qs.stringify({
+          name: depot,
+          vcsType: 'git',
+          gitReadmeEnabled: false,
+          shared: false
+        })
+      });
+      console.log('result => ', result);
     } catch (err) {
       throw new Error(err);
     }
