@@ -14,10 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const hbuilderx_1 = __importDefault(require("hbuilderx"));
 const fs_1 = __importDefault(require("fs"));
-const axios_1 = __importDefault(require("axios"));
+const axios_1 = __importDefault(require("../utils/axios"));
 const isomorphic_git_1 = __importDefault(require("isomorphic-git"));
 const repo_1 = require("../utils/repo");
-const accessToken = '1b7fca3bd7594a89b0f5e2a0250c1147';
+const mock_1 = __importDefault(require("../mock"));
 class CodingServer {
     constructor(session, repo) {
         this._repo = {};
@@ -45,7 +45,7 @@ class CodingServer {
         });
     }
     getUserInfo(team, token) {
-        var _a, _b;
+        var _a;
         if (token === void 0) { token = ((_a = this._session) === null || _a === void 0 ? void 0 : _a.accessToken) || ``; }
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -54,32 +54,55 @@ class CodingServer {
                         access_token: token,
                     },
                 });
-                if (result.data.code) {
-                    console.error(result.data.msg);
-                    return Promise.reject(result.data.msg);
+                if (result.code) {
+                    console.error(result.msg);
+                    return Promise.reject(result.msg);
                 }
-                return (_b = result.data) === null || _b === void 0 ? void 0 : _b.data;
+                return result === null || result === void 0 ? void 0 : result.data;
             }
             catch (err) {
-                throw Error(err);
+                throw new Error(err);
             }
         });
     }
     getMrList(team = this._repo.team, project = this._repo.project, repo = this._repo.repo) {
-        var _a, _b;
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const url = `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
-            const result = yield axios_1.default.get(url, {
-                params: {
-                    status: `open`,
-                    sort: `action_at`,
-                    page: 1,
-                    PageSize: 100,
-                    sortDirection: `DESC`,
-                    access_token: accessToken,
-                }
-            });
-            return ((_b = (_a = result.data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.list) || [];
+            return mock_1.default.MR_LIST.data.list;
+            try {
+                const url = `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
+                const result = yield axios_1.default.get(url, {
+                    params: {
+                        status: `open`,
+                        sort: `action_at`,
+                        page: 1,
+                        PageSize: 100,
+                        sortDirection: `DESC`,
+                        access_token: this._session.accessToken,
+                    }
+                });
+                return ((_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.list) || [];
+            }
+            catch (err) {
+                throw new Error(err);
+            }
+        });
+    }
+    getDepotList(team = this._repo.team, project = this._repo.project) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            return mock_1.default.DEPOT_LIST.data.depots;
+            try {
+                const result = yield axios_1.default.get(`https://${team}.coding.net/api/user/${team}/project/${project}/repos`, {
+                    params: {
+                        access_token: this._session.accessToken,
+                    }
+                });
+                return ((_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.depots) || [];
+            }
+            catch (err) {
+                throw new Error(err);
+            }
         });
     }
 }

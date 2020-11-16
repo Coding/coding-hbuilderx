@@ -1,7 +1,8 @@
 import hx from 'hbuilderx';
 import DepotTreeDataProvider from './trees/depot';
 import MRTreeDataProvider from './trees/mr';
-import { getMRUrl } from './utils/repo';
+import { getMRUrl, getDepotUrl } from './utils/repo';
+import { IDepot, IMRItem } from './typings/common';
 
 export function registerCommands(context: IContext) {
   const { webviewProvider, repoInfo } = context;
@@ -11,14 +12,18 @@ export function registerCommands(context: IContext) {
     // webviewProvider.panel.webView.postMessage('hhhhh');
   }));
 
-  context.subscriptions.push(hx.commands.registerCommand('codingPlugin.mrTreeItemClick', function(param: any[]) {
+  context.subscriptions.push(hx.commands.registerCommand('codingPlugin.mrTreeItemClick', function(param: IMRItem) {
     // hx.window.showInformationMessage('选中了TreeItem:' + param[0]);
     // webviewProvider.update(param[0]);
-    hx.env.openExternal(getMRUrl(repoInfo.team, param[0]));
+    hx.env.openExternal(getMRUrl(repoInfo.team, param));
+  }));
+
+  context.subscriptions.push(hx.commands.registerCommand('codingPlugin.depotTreeItemClick', function(param: IDepot) {
+    hx.env.openExternal(getDepotUrl(repoInfo.team, param));
   }));
 }
 
-export function registerTreeViews(context: IContext) {
+export function createTreeViews(context: IContext) {
   context.subscriptions.push(hx.window.createTreeView('codingPlugin.treeMR', {
     showCollapseAll: true,
     treeDataProvider: new MRTreeDataProvider(context)
@@ -26,14 +31,11 @@ export function registerTreeViews(context: IContext) {
 
   context.subscriptions.push(hx.window.createTreeView('codingPlugin.treeDepot', {
     showCollapseAll: true,
-    treeDataProvider: new DepotTreeDataProvider(context, [
-      { name: '仓库列表', children: [{ name: '111' }] },
-      { name: '创建仓库' }
-    ])
+    treeDataProvider: new DepotTreeDataProvider(context)
   }));
 }
 
 export default function init(context: IContext) {
   registerCommands(context);
-  registerTreeViews(context);
+  createTreeViews(context);
 }

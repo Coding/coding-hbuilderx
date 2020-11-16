@@ -3,6 +3,8 @@ import WebviewProvider from './webview';
 import CodingServer from './services/codingServer';
 import { proxyCtx } from './utils/proxy';
 
+const accessToken = '1b7fca3bd7594a89b0f5e2a0250c1147';
+
 async function activate(context: IContext) {
   const webviewProvider = new WebviewProvider();
   const repoInfo = await CodingServer.getRepoParams();
@@ -18,7 +20,7 @@ async function activate(context: IContext) {
         path: 'string',
         team: 'string'
       },
-      accessToken: '1b7fca3bd7594a89b0f5e2a0250c1147',
+      accessToken,
       refreshToken: 'abc'
     },
     repoInfo || {
@@ -41,7 +43,6 @@ async function activate(context: IContext) {
   };
 
   proxyCtx(context);
-
   init(context);
 }
 

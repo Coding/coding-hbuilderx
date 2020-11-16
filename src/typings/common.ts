@@ -48,3 +48,20 @@ export interface IMRItem {
   author: IUserInfo;
   reviewers: IReviewer[];
 }
+
+export interface IDepot {
+  depotPath: string;
+  gitHttpsHost: string;
+  gitHttpsUrl: string;
+  gitSshHost: string;
+  gitSshUrl: string;
+  id: number;
+  isDefault: boolean;
+  isSvnHttp: boolean;
+  name: string;
+  shared: boolean;
+  size: number;
+  status: number;
+  svnEnabled: boolean;
+  vcsType: 'git' | 'svn'
+}

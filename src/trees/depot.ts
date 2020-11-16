@@ -1,31 +1,45 @@
 import hx from 'hbuilderx';
+import { IDepot } from '../typings/common';
+
+interface IItem extends ITreeItem {
+  disableClick: boolean;
+}
 
 class DepotTreeDataProvider extends hx.TreeDataProvider {
-  constructor(context: IContext, treeData: ITreeItem[]) {
+  constructor(context: IContext) {
     super();
     this.context = context;
-    this._treeData = treeData;
   }
 
-  getChildren(element: ITreeItem) {
-    return new Promise(resolve => {
-      if (!element) {
-        resolve(this._treeData);
-      } else {
-        resolve(element.children);
-      }
-    });
+  async getChildren(element: IDepot & IItem) {
+    if (element) {
+      return Promise.resolve(element.children);
+    }
+
+    try {
+      const depots = await this.context.codingServer.getDepotList();
+      return Promise.resolve([
+        {
+          name: '创建仓库',
+          disableClick: true,
+        },
+        {
+          name: '仓库列表',
+          children: depots
+        }
+      ]);
+    } catch {
+      console.error('获取仓库列表失败');
+    }
   }
 
-  getTreeItem(element: ITreeItem) {
+  getTreeItem(element: IDepot & IItem) {
     return {
       label: element.name,
       collapsibleState: element.children ? 1 : 0,
       command: {
-        command: element.children ? '' : 'codingPlugin.treeItemClick',
-        arguments: [
-          element.name
-        ]
+        command: (element.children || element.disableClick) ? '' : 'codingPlugin.depotTreeItemClick',
+        arguments: element
       }
     };
   }

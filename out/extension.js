@@ -17,6 +17,7 @@ const init_1 = __importDefault(require("./init"));
 const webview_1 = __importDefault(require("./webview"));
 const codingServer_1 = __importDefault(require("./services/codingServer"));
 const proxy_1 = require("./utils/proxy");
+const accessToken = '1b7fca3bd7594a89b0f5e2a0250c1147';
 function activate(context) {
     return __awaiter(this, void 0, void 0, function* () {
         const webviewProvider = new webview_1.default();
@@ -31,7 +32,7 @@ function activate(context) {
                 path: 'string',
                 team: 'string'
             },
-            accessToken: '1b7fca3bd7594a89b0f5e2a0250c1147',
+            accessToken,
             refreshToken: 'abc'
         }, repoInfo || {
             team: 'codingcorp',

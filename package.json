@@ -26,6 +26,10 @@
       {
         "command": "codingPlugin.mrTreeItemClick",
         "title": "Click MR Tree Item"
+      },
+      {
+        "command": "codingPlugin.depotTreeItemClick",
+        "title": "Click Depot Tree Item"
       }
     ],
     "menus": {

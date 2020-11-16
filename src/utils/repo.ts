@@ -1,4 +1,4 @@
-import { RepoInfo, IMRItem } from '../typings/common';
+import { RepoInfo, IMRItem, IDepot } from '../typings/common';
 
 export function parseCloneUrl(url: string): RepoInfo | null {
 	const reg = /^(https:\/\/|git@)e\.coding\.net(\/|:)(.*)\.git$/i;
@@ -19,4 +19,8 @@ export function parseCloneUrl(url: string): RepoInfo | null {
 
 export function getMRUrl(team: string, mrItem: IMRItem): string {
 	return `https://${team}.coding.net${mrItem.path}`;
+}
+
+export function getDepotUrl(team: string, depot: IDepot): string {
+	return `https://${team}.coding.net${depot.depotPath}`;
 }

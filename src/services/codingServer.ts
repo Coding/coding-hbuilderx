@@ -1,11 +1,10 @@
 import hx from 'hbuilderx';
 import fs from 'fs';
-import axios from 'axios';
+import axios from '../utils/axios';
 import git from 'isomorphic-git';
 import { IRepoInfo, ISessionData } from '../typings/common';
 import { parseCloneUrl } from '../utils/repo';
-
-const accessToken = '1b7fca3bd7594a89b0f5e2a0250c1147';
+import MOCK from '../mock';
 
 export default class CodingServer {
   _session!: ISessionData;
@@ -45,14 +44,14 @@ export default class CodingServer {
         },
       });
 
-      if (result.data.code) {
-        console.error(result.data.msg);
-        return Promise.reject(result.data.msg);
+      if (result.code) {
+        console.error(result.msg);
+        return Promise.reject(result.msg);
       }
 
-      return result.data?.data;
+      return result?.data;
     } catch (err) {
-      throw Error(err);
+      throw new Error(err);
     }
   }
 
@@ -61,17 +60,36 @@ export default class CodingServer {
     project: string = this._repo.project,
     repo: string = this._repo.repo
   ) {
-    const url = `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
-    const result = await axios.get(url, {
-      params: {
-        status: `open`,
-        sort: `action_at`,
-        page: 1,
-        PageSize: 100,
-        sortDirection: `DESC`,
-        access_token: accessToken,
-      }
-    });
-    return result.data?.data?.list || [];
+    return MOCK.MR_LIST.data.list;
+    try {
+      const url = `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
+      const result = await axios.get(url, {
+        params: {
+          status: `open`,
+          sort: `action_at`,
+          page: 1,
+          PageSize: 100,
+          sortDirection: `DESC`,
+          access_token: this._session.accessToken,
+        }
+      });
+      return result?.data?.list || [];
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+
+  async getDepotList(team: string = this._repo.team, project: string = this._repo.project) {
+    return MOCK.DEPOT_LIST.data.depots;
+    try {
+      const result = await axios.get(`https://${team}.coding.net/api/user/${team}/project/${project}/repos`, {
+        params: {
+          access_token: this._session.accessToken,
+        }
+      });
+      return result?.data?.depots || [];
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 }

@@ -23,20 +23,26 @@ class MRTreeDataProvider extends hbuilderx_1.default.TreeDataProvider {
             if (element) {
                 return Promise.resolve(element.children);
             }
-            const list = yield this.context.codingServer.getMrList();
-            const userId = this.context.userInfo.id;
-            const createdList = list.filter((item) => item.author.id === userId);
-            const reviewerList = list.filter((item) => item.reviewers.find((r) => r.reviewer.id === userId));
-            return Promise.resolve([
-                {
-                    title: `Created By Me (${createdList.length})`,
-                    children: createdList
-                },
-                {
-                    title: `Waiting For My Review (${reviewerList.length})`,
-                    children: reviewerList
-                }
-            ]);
+            try {
+                const list = yield this.context.codingServer.getMrList();
+                const userId = this.context.userInfo.id;
+                const createdList = list.filter((item) => item.author.id === userId);
+                const reviewerList = list.filter((item) => item.reviewers.find((r) => r.reviewer.id === userId));
+                return Promise.resolve([
+                    {
+                        title: `Created By Me (${createdList.length})`,
+                        children: createdList
+                    },
+                    {
+                        title: `Waiting For My Review (${reviewerList.length})`,
+                        children: reviewerList
+                    }
+                ]);
+            }
+            catch (_a) {
+                console.error('获取MR列表失败');
+                Promise.resolve([]);
+            }
         });
     }
     getTreeItem(element) {
@@ -45,9 +51,7 @@ class MRTreeDataProvider extends hbuilderx_1.default.TreeDataProvider {
             collapsibleState: element.children ? 1 : 0,
             command: {
                 command: element.children ? '' : 'codingPlugin.mrTreeItemClick',
-                arguments: [
-                    element
-                ]
+                arguments: element
             }
         };
     }

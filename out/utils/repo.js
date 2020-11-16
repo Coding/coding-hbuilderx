@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMRUrl = exports.parseCloneUrl = void 0;
+exports.getDepotUrl = exports.getMRUrl = exports.parseCloneUrl = void 0;
 function parseCloneUrl(url) {
     const reg = /^(https:\/\/|git@)e\.coding\.net(\/|:)(.*)\.git$/i;
     const result = url.match(reg);
@@ -19,3 +19,7 @@ function getMRUrl(team, mrItem) {
     return `https://${team}.coding.net${mrItem.path}`;
 }
 exports.getMRUrl = getMRUrl;
+function getDepotUrl(team, depot) {
+    return `https://${team}.coding.net${depot.depotPath}`;
+}
+exports.getDepotUrl = getDepotUrl;
