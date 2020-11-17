@@ -1,7 +1,21 @@
 import axios, { AxiosRequestConfig, AxiosInstance } from 'axios';
+import toast from './toast';
+
+const formatErrorMessage = (msg: string | Record<string, string>) => {
+  if (typeof msg === 'string') return msg;
+  return Object.values(msg).join();
+};
 
 const handleResponse = (response: any) => {
-  return response.data;
+  const result = response.data;
+
+  if (result.code) {
+    const message = formatErrorMessage(result.msg);
+    toast.error(message);
+    throw new Error(message);
+  }
+
+  return result;
 };
 
 const handleError = (error: any) => {

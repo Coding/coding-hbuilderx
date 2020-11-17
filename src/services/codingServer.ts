@@ -54,14 +54,9 @@ export default class CodingServer {
         },
       });
 
-      if (result.code) {
-        toast.error(result.msg);
-        return Promise.reject(result.msg);
-      }
-
       return result?.data;
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   }
 
@@ -82,7 +77,7 @@ export default class CodingServer {
       });
       return result?.data?.list || [];
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   }
 
@@ -97,19 +92,35 @@ export default class CodingServer {
         },
       });
 
-      if (result.code) {
-        toast.error(result.msg);
-        return Promise.reject(result.msg);
-      }
-
       return result?.data?.depots || [];
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   }
 
-  async createDepot(team: string = this._repo?.team, project: string = this._repo?.project, depot: string) {
+  async createProject(team: string, project: string) {
     try {
+      const result = await axios({
+        method: 'post',
+        url: `https://${team}.coding.net/api/team/${team}/template-project?access_token=${this._session.accessToken}`,
+        data: {
+          name: project,
+          displayName: project,
+          projectTemplate: 'DEV_OPS',
+          icon: '/static/project_icon/scenery-version-2-5.svg',
+        },
+      });
+
+      return result.data;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async createDepot(team: string, project: string, depot: string) {
+    try {
+      await this.createProject(team, project);
+
       const result = await axios({
         method: 'post',
         url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot?access_token=${this._session.accessToken}`,
@@ -124,7 +135,7 @@ export default class CodingServer {
         }),
       });
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   }
 }
