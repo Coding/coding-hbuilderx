@@ -1,4 +1,5 @@
 import hx from 'hbuilderx';
+import ACTIONS, { dispatch } from '../utils/actions';
 import { IDepot } from '../typings/common';
 
 interface IItem extends ITreeItem {
@@ -24,7 +25,11 @@ class DepotTreeDataProvider extends hx.TreeDataProvider {
 
     try {
       const depots = await this.context.codingServer.getDepotList();
-      this.context.depots = depots;
+
+      dispatch(ACTIONS.SET_DEPOTS, {
+        context: this.context,
+        value: depots,
+      });
 
       return Promise.resolve([
         {

@@ -14,11 +14,9 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
   }
 
   getRepoInfo() {
-    const user = this.context.codingServer.session?.user;
-
-    const repoInfo = getMrListParams(this.context.repoInfo, this.context.selectedDepot, this.context.depots, user);
-
-    return repoInfo;
+    const { repoInfo, selectedDepot, depots, codingServer } = this.context;
+    const user = codingServer.session?.user;
+    return getMrListParams(repoInfo, selectedDepot, depots, user);
   }
 
   async getChildren(element?: IMRItem & IItem) {

@@ -32,10 +32,6 @@
         "title": "Click Depot Tree Item"
       },
       {
-        "command": "codingPlugin.createProjectAndDepot",
-        "title": "Create Project and Depot"
-      },
-      {
         "command": "codingPlugin.createDepot",
         "title": "Create Depot"
       }

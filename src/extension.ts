@@ -1,6 +1,7 @@
 import init from './init';
 import WebviewProvider from './webview';
 import CodingServer from './services/codingServer';
+import ACTIONS, { dispatch } from './utils/actions';
 import { proxyCtx } from './utils/proxy';
 
 const accessToken = '1b7fca3bd7594a89b0f5e2a0250c1147';
@@ -30,13 +31,16 @@ async function activate(context: IContext) {
     repoInfo,
   );
 
-  context.ctx = {
-    webviewProvider,
-    codingServer,
-    repoInfo,
-    depots: [],
-    selectedDepot: null,
-  };
+  dispatch(ACTIONS.SET_CTX, {
+    context,
+    value: {
+      webviewProvider,
+      codingServer,
+      repoInfo,
+      depots: [],
+      selectedDepot: null,
+    },
+  });
 
   proxyCtx(context);
   init(context);

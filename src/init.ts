@@ -1,8 +1,10 @@
 import hx from 'hbuilderx';
 import DepotTreeDataProvider from './trees/depot';
 import MRTreeDataProvider from './trees/mr';
-import { getMRUrl } from './utils/repo';
+
 import toast from './utils/toast';
+import { getMRUrl } from './utils/repo';
+import ACTIONS, { dispatch } from './utils/actions';
 import { IDepot, IMRItem } from './typings/common';
 
 export function registerCommands(context: IContext) {
@@ -23,17 +25,10 @@ export function registerCommands(context: IContext) {
 
   context.subscriptions.push(
     hx.commands.registerCommand('codingPlugin.depotTreeItemClick', function (param: IDepot) {
-      toast.info(param.name);
-    }),
-  );
-
-  context.subscriptions.push(
-    hx.commands.registerCommand('codingPlugin.createProjectAndDepot', async function () {
-      const project = await hx.window.showInputBox({
-        prompt: '请输入项目名',
-      });
-      const depot = await hx.window.showInputBox({
-        prompt: '请输入仓库名',
+      toast.info(`选中仓库：${param.name}`);
+      dispatch(ACTIONS.SET_SELECTED_DEPOT, {
+        context,
+        value: param,
       });
     }),
   );
