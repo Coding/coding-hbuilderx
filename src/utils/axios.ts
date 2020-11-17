@@ -10,10 +10,10 @@ const handleError = (error: any) => {
 };
 
 interface Instance extends AxiosInstance {
-  (config: AxiosRequestConfig): Promise<any>
+  (config: AxiosRequestConfig): Promise<any>;
 }
 
-const createInstance = (): any => {
+const createInstance = (): Instance => {
   const instance = axios.create();
   instance.interceptors.response.use(handleResponse, handleError);
   return instance;

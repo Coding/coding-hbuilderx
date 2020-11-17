@@ -38,7 +38,9 @@ export default class CodingServer {
 
   async getUserInfo(team: string, token: string = this._session?.accessToken || ``) {
     try {
-      const result = await axios.get(`https://${team}.coding.net/api/current_user`, {
+      const result = await axios({
+        method: 'get',
+        url: `https://${team}.coding.net/api/current_user`,
         params: {
           access_token: token,
         },
@@ -60,10 +62,11 @@ export default class CodingServer {
     project: string = this._repo.project,
     repo: string = this._repo.repo,
   ) {
-    return MOCK.MR_LIST.data.list;
     try {
       const url = `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
-      const result = await axios.get(url, {
+      const result = await axios({
+        method: 'get',
+        url,
         params: {
           status: `open`,
           sort: `action_at`,
@@ -80,9 +83,10 @@ export default class CodingServer {
   }
 
   async getDepotList(team: string = this._repo.team, project: string = this._repo.project) {
-    return MOCK.DEPOT_LIST.data.depots;
     try {
-      const result = await axios.get(`https://${team}.coding.net/api/user/${team}/project/${project}/repos`, {
+      const result = await axios({
+        method: 'get',
+        url: `https://${team}.coding.net/api/user/${team}/project/${project}/repos`,
         params: {
           access_token: this._session.accessToken,
         },
@@ -102,7 +106,7 @@ export default class CodingServer {
       const result = await axios({
         method: 'post',
         url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot?access_token=${this._session.accessToken}`,
-        header: {
+        headers: {
           'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
         },
         data: qs.stringify({
