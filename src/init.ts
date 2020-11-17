@@ -8,8 +8,7 @@ import ACTIONS, { dispatch } from './utils/actions';
 import { IDepot, IMRItem } from './typings/common';
 
 export function registerCommands(context: IContext) {
-  const { repoInfo, codingServer } = context;
-  const { team } = repoInfo;
+  const { codingServer } = context;
 
   context.subscriptions.push(
     hx.commands.registerCommand('codingPlugin.helloWorld', () => {
@@ -38,6 +37,7 @@ export function registerCommands(context: IContext) {
       const depot = await hx.window.showInputBox({
         prompt: '请输入仓库名',
       });
+      const team = codingServer.session?.user?.team;
       const result = await codingServer.createDepot(team, depot, depot);
       // TODO: 拉取代码，更新workspace
     }),

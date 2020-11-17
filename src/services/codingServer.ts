@@ -5,6 +5,7 @@ import axios from '../utils/axios';
 import git from 'isomorphic-git';
 import { IRepoInfo, ISessionData } from '../typings/common';
 import { parseCloneUrl } from '../utils/repo';
+import toast from '../utils/toast';
 
 export default class CodingServer {
   _session!: ISessionData;
@@ -31,7 +32,7 @@ export default class CodingServer {
     const folders = await hx.workspace.getWorkspaceFolders();
 
     if (!folders.length) {
-      console.warn('workspace中没有目录');
+      toast.warn('workspace中没有目录');
       return;
     }
 
@@ -39,7 +40,7 @@ export default class CodingServer {
       const remotes = await git.listRemotes({ fs, dir: folders[0].uri.path });
       return parseCloneUrl(remotes[0].url);
     } catch {
-      console.error('该目录没有进行git初始化');
+      toast.error('该目录没有进行git初始化');
     }
   }
 
@@ -54,7 +55,7 @@ export default class CodingServer {
       });
 
       if (result.code) {
-        console.error(result.msg);
+        toast.error(result.msg);
         return Promise.reject(result.msg);
       }
 
@@ -95,14 +96,16 @@ export default class CodingServer {
           access_token: this._session.accessToken,
         },
       });
+
+      if (result.code) {
+        toast.error(result.msg);
+        return Promise.reject(result.msg);
+      }
+
       return result?.data?.depots || [];
     } catch (err) {
       throw new Error(err);
     }
-  }
-
-  async createProjectAndDepot(team: string, payload: { project: string; depot: string }) {
-    return 'createProjectAndDepot';
   }
 
   async createDepot(team: string = this._repo?.team, project: string = this._repo?.project, depot: string) {
@@ -120,7 +123,6 @@ export default class CodingServer {
           shared: false,
         }),
       });
-      console.log('result => ', result);
     } catch (err) {
       throw new Error(err);
     }

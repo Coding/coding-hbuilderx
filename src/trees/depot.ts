@@ -1,5 +1,6 @@
 import hx from 'hbuilderx';
 import ACTIONS, { dispatch } from '../utils/actions';
+import toast from '../utils/toast';
 import { IDepot } from '../typings/common';
 
 interface IItem extends ITreeItem {
@@ -33,16 +34,13 @@ class DepotTreeDataProvider extends hx.TreeDataProvider {
 
       return Promise.resolve([
         {
-          name: '创建仓库',
+          name: '+ 创建仓库',
           _create: true,
         },
-        {
-          name: '仓库列表',
-          children: depots,
-        },
+        ...depots,
       ]);
     } catch {
-      console.error('获取仓库列表失败');
+      toast.error('获取仓库列表失败');
     }
   }
 

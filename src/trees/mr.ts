@@ -5,7 +5,14 @@ import { IMRItem, IRepoInfo, IReviewer } from '../typings/common';
 
 interface IItem extends ITreeItem {
   _disabled: boolean;
+  _create: boolean;
 }
+
+const getCommand = (element: IMRItem & IItem) => {
+  if (element.children || element._disabled) return '';
+  if (element._create) return 'codingPlugin.createDepot';
+  return 'codingPlugin.mrTreeItemClick';
+};
 
 class MRTreeDataProvider extends hx.TreeDataProvider {
   constructor(context: IContext) {
@@ -31,8 +38,12 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
       const repoInfo = this.getRepoInfo();
 
       if (!repoInfo) {
-        toast.warn('请先到扩展视图`CODING 仓库`中创建仓库');
-        return;
+        return Promise.resolve([
+          {
+            title: '+ 创建仓库',
+            _create: true,
+          },
+        ]);
       }
 
       const list = await this.context.codingServer.getMrList(repoInfo);
@@ -47,16 +58,16 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
           _disabled: true,
         },
         {
-          title: `Created By Me (${createdList.length})`,
+          title: `Created By Me (${createdList?.length})`,
           children: createdList,
         },
         {
-          title: `Waiting For My Review (${reviewerList.length})`,
+          title: `Waiting For My Review (${reviewerList?.length})`,
           children: reviewerList,
         },
       ]);
     } catch {
-      console.error('获取MR列表失败');
+      toast.error('获取MR列表失败');
       Promise.resolve([]);
     }
   }
@@ -68,8 +79,8 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
       label: element.title,
       collapsibleState: element.children ? 1 : 0,
       command: {
-        command: element.children || element._disabled ? '' : 'codingPlugin.mrTreeItemClick',
-        arguments: [repoInfo.team, element],
+        command: getCommand(element),
+        arguments: [repoInfo?.team, element],
       },
     };
   }

@@ -3,6 +3,7 @@ import WebviewProvider from './webview';
 import CodingServer from './services/codingServer';
 import ACTIONS, { dispatch } from './utils/actions';
 import { proxyCtx } from './utils/proxy';
+import toast from './utils/toast';
 
 const accessToken = '1b7fca3bd7594a89b0f5e2a0250c1147';
 const user = {
@@ -47,7 +48,7 @@ async function activate(context: IContext) {
 }
 
 function deactivate() {
-  console.log('plugin deactivate');
+  toast.info('plugin deactivate');
 }
 
 export { activate, deactivate };
