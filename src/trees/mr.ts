@@ -1,5 +1,11 @@
 import hx from 'hbuilderx';
-import { IMRItem, IReviewer } from '../typings/common';
+import toast from '../utils/toast';
+import { getMrListParams } from '../utils/mr';
+import { IMRItem, IRepoInfo, IReviewer } from '../typings/common';
+
+interface IItem extends ITreeItem {
+  _disabled: boolean;
+}
 
 class MRTreeDataProvider extends hx.TreeDataProvider {
   constructor(context: IContext) {
@@ -7,27 +13,49 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
     this.context = context;
   }
 
-  async getChildren(element?: IMRItem & ITreeItem) {
+  getRepoInfo() {
+    const user = this.context.codingServer.session?.user;
+
+    const repoInfo = getMrListParams(this.context.repoInfo, this.context.selectedDepot, this.context.depots, user);
+
+    return repoInfo;
+  }
+
+  async getChildren(element?: IMRItem & IItem) {
     if (element) {
       return Promise.resolve(element.children);
     }
 
     try {
-      const list = await this.context.codingServer.getMrList();
+      const user = this.context.codingServer.session?.user;
+      const userId = user?.id;
 
-      const userId = this.context.userInfo.id;
+      const repoInfo = this.getRepoInfo();
+
+      if (!repoInfo) {
+        toast.warn('请先到扩展视图`CODING 仓库`中创建仓库');
+        return;
+      }
+
+      const list = await this.context.codingServer.getMrList(repoInfo);
       const createdList = list.filter((item: IMRItem) => item.author.id === userId);
-      const reviewerList = list.filter((item: IMRItem) => item.reviewers.find((r: IReviewer) => r.reviewer.id === userId));
+      const reviewerList = list.filter((item: IMRItem) =>
+        item.reviewers.find((r: IReviewer) => r.reviewer.id === userId),
+      );
 
       return Promise.resolve([
         {
+          title: `当前代码仓库：${repoInfo.repo}`,
+          _disabled: true,
+        },
+        {
           title: `Created By Me (${createdList.length})`,
-          children: createdList
+          children: createdList,
         },
         {
           title: `Waiting For My Review (${reviewerList.length})`,
-          children: reviewerList
-        }
+          children: reviewerList,
+        },
       ]);
     } catch {
       console.error('获取MR列表失败');
@@ -35,14 +63,16 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
     }
   }
 
-  getTreeItem(element: IMRItem & ITreeItem) {
+  getTreeItem(element: IMRItem & IItem) {
+    const repoInfo = this.getRepoInfo() as IRepoInfo;
+
     return {
       label: element.title,
       collapsibleState: element.children ? 1 : 0,
       command: {
-        command: element.children ? '' : 'codingPlugin.mrTreeItemClick',
-        arguments: element
-      }
+        command: element.children || element._disabled ? '' : 'codingPlugin.mrTreeItemClick',
+        arguments: [repoInfo.team, element],
+      },
     };
   }
 }

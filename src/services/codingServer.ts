@@ -5,11 +5,10 @@ import axios from '../utils/axios';
 import git from 'isomorphic-git';
 import { IRepoInfo, ISessionData } from '../typings/common';
 import { parseCloneUrl } from '../utils/repo';
-import MOCK from '../mock';
 
 export default class CodingServer {
   _session!: ISessionData;
-  _repo: IRepoInfo = {} as IRepoInfo;
+  _repo!: IRepoInfo;
 
   constructor(session?: ISessionData, repo?: IRepoInfo) {
     if (session) {
@@ -18,6 +17,14 @@ export default class CodingServer {
     if (repo) {
       this._repo = repo;
     }
+  }
+
+  get session() {
+    return this._session;
+  }
+
+  get repo() {
+    return this._repo;
   }
 
   static async getRepoParams() {
@@ -57,11 +64,7 @@ export default class CodingServer {
     }
   }
 
-  async getMrList(
-    team: string = this._repo.team,
-    project: string = this._repo.project,
-    repo: string = this._repo.repo,
-  ) {
+  async getMrList({ team, project, repo }: IRepoInfo) {
     try {
       const url = `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
       const result = await axios({
@@ -82,7 +85,8 @@ export default class CodingServer {
     }
   }
 
-  async getDepotList(team: string = this._repo.team, project: string = this._repo.project) {
+  async getDepotList(team: string = this._repo?.team, project: string = this._repo?.project) {
+    // TODO: 使用新接口
     try {
       const result = await axios({
         method: 'get',
@@ -101,7 +105,7 @@ export default class CodingServer {
     return 'createProjectAndDepot';
   }
 
-  async createDepot(team: string = this._repo.team, project: string = this._repo.project, depot: string) {
+  async createDepot(team: string = this._repo?.team, project: string = this._repo?.project, depot: string) {
     try {
       const result = await axios({
         method: 'post',

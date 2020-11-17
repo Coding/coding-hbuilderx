@@ -24,6 +24,8 @@ class DepotTreeDataProvider extends hx.TreeDataProvider {
 
     try {
       const depots = await this.context.codingServer.getDepotList();
+      this.context.depots = depots;
+
       return Promise.resolve([
         {
           name: '创建仓库',
@@ -31,8 +33,8 @@ class DepotTreeDataProvider extends hx.TreeDataProvider {
         },
         {
           name: '仓库列表',
-          children: depots
-        }
+          children: depots,
+        },
       ]);
     } catch {
       console.error('获取仓库列表失败');
@@ -45,9 +47,9 @@ class DepotTreeDataProvider extends hx.TreeDataProvider {
       collapsibleState: element.children ? 1 : 0,
       command: {
         command: getCommand(element),
-        arguments: element
+        arguments: element,
       },
-      contextValue: 'createDepot'
+      contextValue: 'createDepot',
     };
   }
 }
