@@ -105,6 +105,19 @@
     "watch:extension": "tsc --watch -p ./src",
     "watch:webviews": "webpack --watch --mode development"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx,json}": [
+      "prettier --write"
+    ],
+    "webview/**/*.{ts,tsx}": [
+      "prettier --write"
+    ]
+  },
   "dependencies": {
     "axios": "^0.21.0",
     "isomorphic-git": "^1.8.0",
@@ -120,7 +133,10 @@
     "@typescript-eslint/parser": "^4.7.0",
     "css-loader": "^5.0.1",
     "eslint": "^7.13.0",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.5.1",
     "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.2",
     "style-loader": "^2.0.0",
     "ts-loader": "^8.0.11",
     "typescript": "^4.0.5",
