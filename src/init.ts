@@ -5,7 +5,7 @@ import MRTreeDataProvider from './trees/mr';
 import toast from './utils/toast';
 import { getMRUrl } from './utils/repo';
 import ACTIONS, { dispatch } from './utils/actions';
-import { IDepot, IMRItem, IOAuthResponse } from './typings/common';
+import { IDepot, IMRItem, IOAuthResponse, ITokenType } from './typings/common';
 import * as DCloudService from './services/dcloud';
 
 const { registerCommand } = hx.commands;
@@ -62,28 +62,23 @@ export function createTreeViews(context: IContext) {
     }),
   );
 
-  hx.authorize
-    .login({
-      scopes: ['basic', 'email', 'phone'],
-      appId: DCloudService.appId,
-    })
-    .then(async (param: IOAuthResponse) => {
-      const { code, error } = param;
-      if (error) {
-        console.log(error);
-        return;
-      }
-      console.info(code);
+  initialize();
+}
 
-      try {
-        const token = await DCloudService.applyForToken(code);
-        const resp = await DCloudService.fetchUser(token.data.access_token);
-        console.info(resp);
-        toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
-      } catch (err) {
-        console.error(err);
-      }
-    });
+async function initialize() {
+  try {
+    let aToken = await DCloudService.readToken(ITokenType.AccessToken);
+    if (!aToken) {
+      const code = await DCloudService.grantForUserInfo();
+      const tokenResult = await DCloudService.applyForToken(code);
+      aToken = tokenResult.data.access_token;
+    }
+    const resp = await DCloudService.fetchUser(aToken);
+    console.info(resp);
+    toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 export function workspaceInit() {

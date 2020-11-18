@@ -84,3 +84,8 @@ export interface IDCloudUser {
     phone: string;
   };
 }
+
+export enum ITokenType {
+  AccessToken = `accessToken`,
+  RefreshToken = `refreshToken`,
+}
