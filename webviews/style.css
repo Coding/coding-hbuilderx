@@ -1,0 +1,49 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Segoe UI", "Microsoft YaHei", 微软雅黑, sans-serif;
+}
+
+a {
+  cursor: pointer;
+  color: #06f;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.root {
+  padding: 20px;
+  font-size: 14px;
+}
+
+.title {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.btnGroup {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.btn {
+  margin-right: 10px;
+  padding: 3px 5px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.btn:hover {
+  opacity: 0.8;
+}
+
+.btnPrimary {
+  border: none;
+  background-color: #06f;
+  color: #fff;
+}

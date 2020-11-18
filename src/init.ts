@@ -3,14 +3,13 @@ import DepotTreeDataProvider from './trees/depot';
 import MRTreeDataProvider from './trees/mr';
 
 import toast from './utils/toast';
-import { getMRUrl } from './utils/repo';
 import ACTIONS, { dispatch } from './utils/actions';
 import { IDepot, IMRItem } from './typings/common';
 
 const { registerCommand } = hx.commands;
 
 export function registerCommands(context: IContext) {
-  const { codingServer } = context;
+  const { codingServer, webviewProvider } = context;
 
   context.subscriptions.push(
     registerCommand('codingPlugin.helloWorld', () => {
@@ -20,7 +19,10 @@ export function registerCommands(context: IContext) {
 
   context.subscriptions.push(
     registerCommand('codingPlugin.mrTreeItemClick', function ([team, mrItem]: [string, IMRItem]) {
-      hx.env.openExternal(getMRUrl(team, mrItem));
+      webviewProvider.update({
+        team,
+        ...mrItem,
+      });
     }),
   );
 
