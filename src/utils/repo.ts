@@ -1,16 +1,16 @@
 import { IRepoInfo, IMRItem, IDepot } from '../typings/common';
 
-export function parseCloneUrl(url: string): IRepoInfo | null {
+export function parseCloneUrl(url: string): IRepoInfo | undefined {
   const reg = /^(https:\/\/|git@)e\.coding\.net(\/|:)(.*)\.git$/i;
   const result = url.match(reg);
 
   if (!result) {
-    return null;
+    return;
   }
 
   const str = result.pop();
   if (!str || !str?.includes(`/`)) {
-    return null;
+    return;
   }
 
   const [team, project, repo] = str.split(`/`);

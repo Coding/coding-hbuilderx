@@ -5,11 +5,11 @@ import axios from '../utils/axios';
 import git from 'isomorphic-git';
 import { IRepoInfo, ISessionData } from '../typings/common';
 import { parseCloneUrl } from '../utils/repo';
-import MOCK from '../mock';
+import toast from '../utils/toast';
 
 export default class CodingServer {
   _session!: ISessionData;
-  _repo: IRepoInfo = {} as IRepoInfo;
+  _repo!: IRepoInfo;
 
   constructor(session?: ISessionData, repo?: IRepoInfo) {
     if (session) {
@@ -20,11 +20,19 @@ export default class CodingServer {
     }
   }
 
+  get session() {
+    return this._session;
+  }
+
+  get repo() {
+    return this._repo;
+  }
+
   static async getRepoParams() {
     const folders = await hx.workspace.getWorkspaceFolders();
 
     if (!folders.length) {
-      console.warn('workspace中没有目录');
+      toast.warn('workspace 中没有目录');
       return;
     }
 
@@ -32,7 +40,7 @@ export default class CodingServer {
       const remotes = await git.listRemotes({ fs, dir: folders[0].uri.path });
       return parseCloneUrl(remotes[0].url);
     } catch {
-      console.error('该目录没有进行git初始化');
+      toast.error('该目录没有进行 git 初始化');
     }
   }
 
@@ -46,22 +54,13 @@ export default class CodingServer {
         },
       });
 
-      if (result.code) {
-        console.error(result.msg);
-        return Promise.reject(result.msg);
-      }
-
       return result?.data;
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   }
 
-  async getMrList(
-    team: string = this._repo.team,
-    project: string = this._repo.project,
-    repo: string = this._repo.repo,
-  ) {
+  async getMrList({ team, project, repo }: IRepoInfo) {
     try {
       const url = `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
       const result = await axios({
@@ -78,11 +77,12 @@ export default class CodingServer {
       });
       return result?.data?.list || [];
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   }
 
-  async getDepotList(team: string = this._repo.team, project: string = this._repo.project) {
+  async getDepotList(team: string = this._repo?.team, project: string = this._repo?.project) {
+    // TODO: 使用新接口
     try {
       const result = await axios({
         method: 'get',
@@ -91,18 +91,36 @@ export default class CodingServer {
           access_token: this._session.accessToken,
         },
       });
+
       return result?.data?.depots || [];
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   }
 
-  async createProjectAndDepot(team: string, payload: { project: string; depot: string }) {
-    return 'createProjectAndDepot';
+  async createProject(team: string, project: string) {
+    try {
+      const result = await axios({
+        method: 'post',
+        url: `https://${team}.coding.net/api/team/${team}/template-project?access_token=${this._session.accessToken}`,
+        data: {
+          name: project,
+          displayName: project,
+          projectTemplate: 'DEV_OPS',
+          icon: '/static/project_icon/scenery-version-2-5.svg',
+        },
+      });
+
+      return result.data;
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  async createDepot(team: string = this._repo.team, project: string = this._repo.project, depot: string) {
+  async createDepot(team: string, project: string, depot: string) {
     try {
+      await this.createProject(team, project);
+
       const result = await axios({
         method: 'post',
         url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot?access_token=${this._session.accessToken}`,
@@ -116,9 +134,8 @@ export default class CodingServer {
           shared: false,
         }),
       });
-      console.log('result => ', result);
     } catch (err) {
-      throw new Error(err);
+      console.error(err);
     }
   }
 }

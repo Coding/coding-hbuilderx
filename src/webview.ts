@@ -18,7 +18,7 @@ export default class WebviewProvider {
 
   createPanel() {
     const webviewPanel: IWebviewPanel = hx.window.createWebView('codingPlugin.webview', {
-      enableScripts: true
+      enableScripts: true,
     });
 
     return webviewPanel;
@@ -51,7 +51,7 @@ export default class WebviewProvider {
         </script>
         <script>
           window.addEventListener("message", (msg) => {
-            console.log('msg 222 => ', msg);
+            console.log(msg);
           });
         </script>
         <script src='${fileInfo}'></script>

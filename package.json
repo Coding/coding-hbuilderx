@@ -32,10 +32,6 @@
         "title": "Click Depot Tree Item"
       },
       {
-        "command": "codingPlugin.createProjectAndDepot",
-        "title": "Create Project and Depot"
-      },
-      {
         "command": "codingPlugin.createDepot",
         "title": "Create Depot"
       }
@@ -62,7 +58,7 @@
       "activitybar": [
         {
           "id": "CODING-MR",
-          "title": "CODING MR"
+          "title": "CODING 合并请求"
         },
         {
           "id": "CODING-DEPOT",
@@ -80,7 +76,7 @@
       "CODING-MR": [
         {
           "id": "codingPlugin.treeMR",
-          "name": "CODING MR"
+          "name": "CODING 合并请求"
         }
       ],
       "CODING-DEPOT": [

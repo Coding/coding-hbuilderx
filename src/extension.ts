@@ -1,10 +1,19 @@
-import hx from 'hbuilderx';
 import init from './init';
 import WebviewProvider from './webview';
 import CodingServer from './services/codingServer';
+import ACTIONS, { dispatch } from './utils/actions';
 import { proxyCtx } from './utils/proxy';
+import toast from './utils/toast';
 
 const accessToken = '1b7fca3bd7594a89b0f5e2a0250c1147';
+const user = {
+  id: 8005956,
+  avatar: 'https://coding-net-production-static-ci.codehub.cn/WM-TEXT-AVATAR-lvVeBfbGLtCPdcsAOPod.jpg',
+  global_key: 'PDCOwrBjib',
+  name: 'uniquemo',
+  path: '/u/PDCOwrBjib',
+  team: 'uniquemo',
+};
 
 async function activate(context: IContext) {
   // TODO: 认证，拿到用户信息
@@ -13,52 +22,32 @@ async function activate(context: IContext) {
   const repoInfo = await CodingServer.getRepoParams();
   console.log('repoInfo ==> ', repoInfo);
 
-  if (!repoInfo) {
-    hx.window.showWarningMessage('workspace中没有CODING的代码仓库');
-    return;
-  }
-
   const codingServer = new CodingServer(
     {
-      id: '123',
-      user: {
-        avatar: 'string',
-        global_key: 'string',
-        name: 'string',
-        path: 'string',
-        team: 'string'
-      },
+      id: 'abc',
+      user,
       accessToken,
-      refreshToken: 'abc'
+      refreshToken: 'abc',
     },
-    repoInfo || {
-      team: 'codingcorp',
-      project: 'mo-test',
-      repo: 'mo-test'
-    }
+    repoInfo,
   );
 
-  let userInfo = null;
-  if (repoInfo) {
-    userInfo = await codingServer.getUserInfo(repoInfo.team);
-  }
-
-  context.ctx = {
-    webviewProvider,
-    codingServer,
-    repoInfo,
-    userInfo
-  };
+  dispatch(ACTIONS.SET_CTX, {
+    context,
+    value: {
+      webviewProvider,
+      codingServer,
+      depots: [],
+      selectedDepot: null,
+    },
+  });
 
   proxyCtx(context);
   init(context);
 }
 
 function deactivate() {
-  console.log('plugin deactivate');
+  toast.info('plugin deactivate');
 }
 
-export {
-  activate,
-  deactivate
-};
+export { activate, deactivate };
