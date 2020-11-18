@@ -5,7 +5,8 @@ import MRTreeDataProvider from './trees/mr';
 import toast from './utils/toast';
 import { getMRUrl } from './utils/repo';
 import ACTIONS, { dispatch } from './utils/actions';
-import { IDepot, IMRItem } from './typings/common';
+import { IDepot, IMRItem, IOAuthResponse } from './typings/common';
+import * as DCloudService from './services/dcloud';
 
 const { registerCommand } = hx.commands;
 
@@ -60,6 +61,29 @@ export function createTreeViews(context: IContext) {
       treeDataProvider: new DepotTreeDataProvider(context),
     }),
   );
+
+  hx.authorize
+    .login({
+      scopes: ['basic', 'email', 'phone'],
+      appId: DCloudService.appId,
+    })
+    .then(async (param: IOAuthResponse) => {
+      const { code, error } = param;
+      if (error) {
+        console.log(error);
+        return;
+      }
+      console.info(code);
+
+      try {
+        const token = await DCloudService.applyForToken(code);
+        const resp = await DCloudService.fetchUser(token.data.access_token);
+        console.info(resp);
+        toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
+      } catch (err) {
+        console.error(err);
+      }
+    });
 }
 
 export function workspaceInit() {

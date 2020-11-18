@@ -1,9 +1,9 @@
 {
-  "name": "coding-hbuilderx",
-  "description": "your extension description",
-  "displayName": "your extension display name",
-  "version": "0.0.0",
-  "publisher": "your name",
+  "name": "codingplugin",
+  "description": "",
+  "displayName": "CODING 代码仓库插件",
+  "version": "1.0.0",
+  "publisher": "coding",
   "engines": {
     "HBuilderX": "^2.7.0"
   },
