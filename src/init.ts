@@ -7,23 +7,25 @@ import { getMRUrl } from './utils/repo';
 import ACTIONS, { dispatch } from './utils/actions';
 import { IDepot, IMRItem } from './typings/common';
 
+const { registerCommand } = hx.commands;
+
 export function registerCommands(context: IContext) {
   const { codingServer } = context;
 
   context.subscriptions.push(
-    hx.commands.registerCommand('codingPlugin.helloWorld', () => {
+    registerCommand('codingPlugin.helloWorld', () => {
       toast.info('hello');
     }),
   );
 
   context.subscriptions.push(
-    hx.commands.registerCommand('codingPlugin.mrTreeItemClick', function ([team, mrItem]: [string, IMRItem]) {
+    registerCommand('codingPlugin.mrTreeItemClick', function ([team, mrItem]: [string, IMRItem]) {
       hx.env.openExternal(getMRUrl(team, mrItem));
     }),
   );
 
   context.subscriptions.push(
-    hx.commands.registerCommand('codingPlugin.depotTreeItemClick', function (param: IDepot) {
+    registerCommand('codingPlugin.depotTreeItemClick', function (param: IDepot) {
       toast.info(`选中仓库：${param.name}`);
       dispatch(ACTIONS.SET_SELECTED_DEPOT, {
         context,
@@ -33,7 +35,7 @@ export function registerCommands(context: IContext) {
   );
 
   context.subscriptions.push(
-    hx.commands.registerCommand('codingPlugin.createDepot', async function (param: any) {
+    registerCommand('codingPlugin.createDepot', async function (param: any) {
       const depot = await hx.window.showInputBox({
         prompt: '请输入仓库名',
       });
