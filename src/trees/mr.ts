@@ -67,7 +67,7 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
         },
       ]);
     } catch {
-      toast.error('获取MR列表失败');
+      toast.error('获取 MR 列表失败');
       Promise.resolve([]);
     }
   }

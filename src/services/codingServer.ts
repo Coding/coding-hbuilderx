@@ -32,7 +32,7 @@ export default class CodingServer {
     const folders = await hx.workspace.getWorkspaceFolders();
 
     if (!folders.length) {
-      toast.warn('workspace中没有目录');
+      toast.warn('workspace 中没有目录');
       return;
     }
 
@@ -40,7 +40,7 @@ export default class CodingServer {
       const remotes = await git.listRemotes({ fs, dir: folders[0].uri.path });
       return parseCloneUrl(remotes[0].url);
     } catch {
-      toast.error('该目录没有进行git初始化');
+      toast.error('该目录没有进行 git 初始化');
     }
   }
 
