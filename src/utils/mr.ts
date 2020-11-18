@@ -1,12 +1,7 @@
 import { IRepoInfo, IDepot, IUserInfo } from '../typings/common';
 
-export const getMrListParams = (
-  repoInfo: IRepoInfo,
-  selectedDepot: IDepot,
-  depots: IDepot[],
-  user: IUserInfo,
-): IRepoInfo | undefined => {
-  const { team } = user;
+export const getMrListParams = (selectedDepot: IDepot, depots: IDepot[], user: IUserInfo): IRepoInfo | undefined => {
+  const team = user?.team;
   let depot = selectedDepot;
 
   if (!depot) {
@@ -21,6 +16,4 @@ export const getMrListParams = (
       return { team, project, repo };
     }
   }
-
-  if (repoInfo) return repoInfo;
 };

@@ -5,10 +5,12 @@ import { IDepot } from '../typings/common';
 
 interface IItem extends ITreeItem {
   _create: boolean;
+  _auth: boolean;
 }
 
 const getCommand = (element: IDepot & IItem) => {
   if (element.children) return '';
+  if (element._auth) return 'codingPlugin.auth';
   if (element._create) return 'codingPlugin.createDepot';
   return 'codingPlugin.depotTreeItemClick';
 };
@@ -19,7 +21,22 @@ class DepotTreeDataProvider extends hx.TreeDataProvider {
     this.context = context;
   }
 
+  getUser() {
+    return this.context.codingServer.session?.user;
+  }
+
   async getChildren(element: IDepot & IItem) {
+    const user = this.getUser();
+    if (!user) {
+      toast.warn('请先绑定 CODING 账户');
+      return Promise.resolve([
+        {
+          name: '绑定 CODING 账户',
+          _auth: true,
+        },
+      ]);
+    }
+
     if (element) {
       return Promise.resolve(element.children);
     }

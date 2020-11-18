@@ -47,7 +47,7 @@ export function registerCommands(context: IContext) {
 export function createTreeViews(context: IContext) {
   context.subscriptions.push(
     hx.window.createTreeView('codingPlugin.treeMR', {
-      showCollapseAll: true,
+      showCollapseAll: false,
       treeDataProvider: new MRTreeDataProvider(context),
     }),
   );

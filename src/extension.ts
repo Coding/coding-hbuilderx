@@ -37,7 +37,6 @@ async function activate(context: IContext) {
     value: {
       webviewProvider,
       codingServer,
-      repoInfo,
       depots: [],
       selectedDepot: null,
     },

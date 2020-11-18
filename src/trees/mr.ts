@@ -1,7 +1,7 @@
 import hx from 'hbuilderx';
 import toast from '../utils/toast';
 import { getMrListParams } from '../utils/mr';
-import { IMRItem, IRepoInfo, IReviewer } from '../typings/common';
+import { IMRItem, IReviewer } from '../typings/common';
 
 interface IItem extends ITreeItem {
   _disabled: boolean;
@@ -21,9 +21,13 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
   }
 
   getRepoInfo() {
-    const { repoInfo, selectedDepot, depots, codingServer } = this.context;
+    const { selectedDepot, depots, codingServer } = this.context;
     const user = codingServer.session?.user;
-    return getMrListParams(repoInfo, selectedDepot, depots, user);
+    return getMrListParams(selectedDepot, depots, user);
+  }
+
+  getUser() {
+    return this.context.codingServer.session?.user;
   }
 
   async getChildren(element?: IMRItem & IItem) {
@@ -32,7 +36,7 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
     }
 
     try {
-      const user = this.context.codingServer.session?.user;
+      const user = this.getUser();
       const userId = user?.id;
 
       const repoInfo = this.getRepoInfo();
@@ -40,8 +44,8 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
       if (!repoInfo) {
         return Promise.resolve([
           {
-            title: '+ 创建仓库',
-            _create: true,
+            title: '请先从「CODING 仓库」列表指定仓库',
+            _disabled: true,
           },
         ]);
       }
@@ -73,14 +77,14 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
   }
 
   getTreeItem(element: IMRItem & IItem) {
-    const repoInfo = this.getRepoInfo() as IRepoInfo;
+    const user = this.getUser();
 
     return {
       label: element.title,
       collapsibleState: element.children ? 1 : 0,
       command: {
         command: getCommand(element),
-        arguments: [repoInfo?.team, element],
+        arguments: [user?.team, element],
       },
     };
   }
