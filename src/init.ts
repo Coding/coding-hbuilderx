@@ -42,8 +42,8 @@ export function registerCommands(context: IContext) {
         prompt: '请输入仓库名',
       });
       const team = codingServer.session?.user?.team;
-      const result = await codingServer.createDepot(team, depot, depot);
-      // TODO: 拉取代码，更新workspace
+      await codingServer.createDepot(team, depot, depot);
+      toast.info('仓库创建成功');
     }),
   );
 }

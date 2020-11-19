@@ -24,9 +24,9 @@ export default class CodingServer {
     return this._session;
   }
 
-  get repo() {
-    return this._repo;
-  }
+  getHeaders = (token?: string) => ({
+    Authorization: `token ${token || this._session.accessToken}`,
+  });
 
   static async getRepoParams() {
     const folders = await hx.workspace.getWorkspaceFolders();
@@ -49,9 +49,7 @@ export default class CodingServer {
       const result = await axios({
         method: 'get',
         url: `https://${team}.coding.net/api/current_user`,
-        params: {
-          access_token: token,
-        },
+        headers: this.getHeaders(),
       });
 
       return result?.data;
@@ -66,13 +64,13 @@ export default class CodingServer {
       const result = await axios({
         method: 'get',
         url,
+        headers: this.getHeaders(),
         params: {
           status: `open`,
           sort: `action_at`,
           page: 1,
           PageSize: 100,
           sortDirection: `DESC`,
-          access_token: this._session.accessToken,
         },
       });
       return result?.data?.list || [];
@@ -87,9 +85,7 @@ export default class CodingServer {
       const result = await axios({
         method: 'get',
         url: `https://${team}.coding.net/api/user/${team}/project/${project}/repos`,
-        params: {
-          access_token: this._session.accessToken,
-        },
+        headers: this.getHeaders(),
       });
 
       return result?.data?.depots || [];
@@ -102,7 +98,8 @@ export default class CodingServer {
     try {
       const result = await axios({
         method: 'post',
-        url: `https://${team}.coding.net/api/team/${team}/template-project?access_token=${this._session.accessToken}`,
+        url: `https://${team}.coding.net/api/team/${team}/template-project`,
+        headers: this.getHeaders(),
         data: {
           name: project,
           displayName: project,
@@ -123,9 +120,10 @@ export default class CodingServer {
 
       const result = await axios({
         method: 'post',
-        url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot?access_token=${this._session.accessToken}`,
+        url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot`,
         headers: {
           'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+          ...this.getHeaders(),
         },
         data: qs.stringify({
           name: depot,
