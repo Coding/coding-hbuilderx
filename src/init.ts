@@ -67,13 +67,14 @@ export function createTreeViews(context: IContext) {
 
 async function initialize() {
   try {
-    let aToken = await DCloudService.readToken(ITokenType.AccessToken);
-    if (!aToken) {
+    let hbToken = await DCloudService.readToken(`hbToken`);
+    console.log(`hb token: ${hbToken}`);
+    if (!hbToken) {
       const code = await DCloudService.grantForUserInfo();
       const tokenResult = await DCloudService.applyForToken(code);
-      aToken = tokenResult.data.access_token;
+      hbToken = tokenResult.data.access_token;
     }
-    const resp = await DCloudService.fetchUser(aToken);
+    const resp = await DCloudService.fetchUser(hbToken);
     console.info(resp);
     toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
   } catch (err) {

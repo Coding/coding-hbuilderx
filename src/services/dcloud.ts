@@ -1,4 +1,3 @@
-import keytar from 'keytar';
 import hx from 'hbuilderx';
 
 import axios from '../utils/axios';
@@ -25,8 +24,7 @@ export const applyForToken = async (code: string | null) => {
       return Promise.reject(resp);
     }
 
-    await keytar.setPassword(appId, ITokenType.AccessToken, resp.data.access_token);
-    await keytar.setPassword(appId, ITokenType.RefreshToken, resp.data.refresh_token);
+    await setConfig(`hbToken`, resp.data.access_token);
     return resp;
   } catch (e) {
     return Promise.reject(e);
@@ -44,23 +42,32 @@ export const fetchUser = async (accessToken: string) => {
     if (resp.ret) {
       return Promise.reject(resp);
     }
+
+    if (!resp.data.email) {
+      return Promise.reject(resp);
+    }
+
+    await setConfig(`email`, resp.data.email);
     return resp;
   } catch (e) {
     return Promise.reject(e);
   }
 };
 
-export const setToken = async (name: ITokenType, value: string) => {
-  return await keytar.setPassword(appId, name, value);
+export const setConfig = async (prop: string, value: string) => {
+  const codingPlugin = hx.workspace.getConfiguration(`codingPlugin`);
+  try {
+    await codingPlugin.update(prop, value);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
-export const readToken = async (name: ITokenType) => {
-  const val = await keytar.getPassword(appId, name);
-  if (!val) {
-    return Promise.reject(null);
-  }
-
-  return val;
+export const readToken = async (prop: string) => {
+  const codingPlugin = hx.workspace.getConfiguration(`codingPlugin`);
+  const token = codingPlugin.get(prop, ``);
+  return token;
 };
 
 export const grantForUserInfo = (): Promise<string | null> =>
@@ -76,6 +83,7 @@ export const grantForUserInfo = (): Promise<string | null> =>
           return reject(null);
         }
 
+        console.log(`hbuilder oauth code: `, code);
         return resolve(code);
       });
   });

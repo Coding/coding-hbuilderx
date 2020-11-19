@@ -1,5 +1,5 @@
 {
-  "name": "codingplugin",
+  "name": "coding-hbuilderx",
   "description": "",
   "displayName": "CODING 代码仓库插件",
   "version": "1.0.0",
@@ -91,6 +91,25 @@
           "title": "WEBVIEW"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "CODING 代码仓库插件配置",
+      "properties": {
+        "codingPlugin.email": {
+          "type": "string",
+          "description": "CODING 用户邮箱"
+        },
+        "codingPlugin.token": {
+          "type": "string",
+          "description": "CODING 服务令牌，请勿擅自更改"
+        },
+        "codingPlugin.hbToken": {
+          "type": "string",
+          "description": "请勿修改"
+        }
+
+      }
     }
   },
   "extensionDependencies": [
@@ -117,7 +136,6 @@
   "dependencies": {
     "axios": "^0.21.0",
     "isomorphic-git": "^1.8.0",
-    "keytar": "^7.1.0",
     "querystring": "^0.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
