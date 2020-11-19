@@ -68,7 +68,7 @@
       "rightside": [
         {
           "id": "WebviewContainerId",
-          "title": "WEBVIEW"
+          "title": "CODING 合并请求详情"
         }
       ]
     },
@@ -88,7 +88,7 @@
       "WebviewContainerId": [
         {
           "id": "codingPlugin.webview",
-          "title": "WEBVIEW"
+          "title": "CODING 合并请求详情"
         }
       ]
     }
@@ -116,12 +116,14 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
+    "classnames": "^2.2.6",
     "isomorphic-git": "^1.8.0",
     "querystring": "^0.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },
   "devDependencies": {
+    "@types/classnames": "^2.2.11",
     "@types/node": "^14.14.7",
     "@types/react": "^16.9.56",
     "@types/react-dom": "^16.9.9",
