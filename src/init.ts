@@ -1,29 +1,26 @@
 import hx from 'hbuilderx';
 import DepotTreeDataProvider from './trees/depot';
 import MRTreeDataProvider from './trees/mr';
+import MRCustomEditorProvider from './customEditors/mergeRequest';
 
 import toast from './utils/toast';
 import ACTIONS, { dispatch } from './utils/actions';
+import { openHosts } from './utils/mr';
 import { IDepot, IMRItem } from './typings/common';
 
 const { registerCommand } = hx.commands;
 
 export function registerCommands(context: IContext) {
-  const { codingServer, webviewProvider } = context;
-
-  context.subscriptions.push(
-    registerCommand('codingPlugin.helloWorld', () => {
-      toast.info('hello');
-    }),
-  );
+  const { codingServer } = context;
 
   context.subscriptions.push(
     registerCommand('codingPlugin.mrTreeItemClick', async function ([team, mrItem]: [string, IMRItem]) {
+      openHosts();
       const matchRes = mrItem.path.match(/\/p\/([^/]+)\/d\/([^/]+)\/git\/merge\/([0-9]+)/);
       if (matchRes) {
         const [, project, repo, mergeRequestIId] = matchRes;
         const result = await codingServer.getMrDetail({ team, project, repo, mergeRequestIId });
-        webviewProvider.update({
+        context.mrCustomEditor.update({
           session: codingServer.session,
           mrItem: result,
           repoInfo: {
@@ -90,8 +87,20 @@ export function clear(context: IContext) {
   context.subscriptions.forEach(({ dispose }) => dispose());
 }
 
+export function registerCustomEditors(context: IContext) {
+  const mrCustomEditor = new MRCustomEditorProvider(context);
+
+  hx.window.registerCustomEditorProvider('customEditor.mrDetail', mrCustomEditor);
+
+  dispatch(ACTIONS.SET_MR_CUSTOM_EDITOR, {
+    context,
+    value: mrCustomEditor,
+  });
+}
+
 export default function init(context: IContext) {
   registerCommands(context);
   createTreeViews(context);
+  registerCustomEditors(context);
   workspaceInit();
 }

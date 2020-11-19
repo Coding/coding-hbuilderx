@@ -1,6 +1,6 @@
 import hx from 'hbuilderx';
 import path from 'path';
-import toast from './utils/toast';
+import toast from '../utils/toast';
 
 interface IMessage {
   command: string;

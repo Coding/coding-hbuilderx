@@ -12,17 +12,22 @@
   ],
   "main": "./out/extension",
   "activationEvents": [
-    "onCommand:codingPlugin.helloWorld",
+    "onCustomEditor:customEditor.mrDetail",
     "onView:codingPlugin.treeMR",
-    "onView:codingPlugin.treeDepot",
-    "onView:codingPlugin.webview"
+    "onView:codingPlugin.treeDepot"
   ],
   "contributes": {
-    "commands": [
+    "customEditors": [
       {
-        "command": "codingPlugin.helloWorld",
-        "title": "Hello World"
-      },
+        "viewType": "customEditor.mrDetail",
+        "displayName": "MR Detail",
+        "selector": [{
+            "fileNamePattern": "hosts"
+        }],
+        "priority": "default"
+      }
+    ],
+    "commands": [
       {
         "command": "codingPlugin.mrTreeItemClick",
         "title": "Click MR Tree Item"
@@ -37,16 +42,6 @@
       }
     ],
     "menus": {
-      "editor/context": [
-        {
-          "command": "codingPlugin.helloWorld",
-          "group": "z_commands",
-          "when": "editorTextFocus"
-        },
-        {
-          "group": "z_commands"
-        }
-      ],
       "view/item/context": [
         {
           "command": "codingPlugin.createDepot",
@@ -64,12 +59,6 @@
           "id": "CODING-DEPOT",
           "title": "CODING 仓库"
         }
-      ],
-      "rightside": [
-        {
-          "id": "WebviewContainerId",
-          "title": "CODING 合并请求详情"
-        }
       ]
     },
     "views": {
@@ -83,12 +72,6 @@
         {
           "id": "codingPlugin.treeDepot",
           "name": "CODING 仓库"
-        }
-      ],
-      "WebviewContainerId": [
-        {
-          "id": "codingPlugin.webview",
-          "title": "CODING 合并请求详情"
         }
       ]
     }

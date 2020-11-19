@@ -1,3 +1,5 @@
+import hx from 'hbuilderx';
+import os from 'os';
 import { IRepoInfo, IDepot, IUserInfo } from '../typings/common';
 
 export const getMrListParams = (selectedDepot: IDepot, depots: IDepot[], user: IUserInfo): IRepoInfo | undefined => {
@@ -16,4 +18,22 @@ export const getMrListParams = (selectedDepot: IDepot, depots: IDepot[], user: I
       return { team, project, repo };
     }
   }
+};
+
+export const getHostsPath = () => {
+  const operatingSystem = os.platform();
+  let file;
+  switch (operatingSystem) {
+    case 'win32':
+      break;
+    case 'darwin':
+    default:
+      file = '/etc/hosts';
+  }
+  return file;
+};
+
+export const openHosts = () => {
+  const hostsPath = getHostsPath();
+  hx.workspace.openTextDocument(hostsPath);
 };
