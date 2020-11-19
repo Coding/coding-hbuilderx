@@ -1,9 +1,10 @@
 import hx from 'hbuilderx';
 import path from 'path';
+import toast from './utils/toast';
 
 interface IMessage {
   command: string;
-  text: string;
+  data: any;
 }
 
 export default class WebviewProvider {
@@ -17,11 +18,18 @@ export default class WebviewProvider {
   listen() {
     this.panel.webView.onDidReceiveMessage((message: IMessage) => {
       console.log('webview receive message => ', message);
-      const { command, text } = message;
-      if (command === 'webview.mrDetail') {
-        hx.env.openExternal(text);
-      } else {
-        hx.commands.executeCommand(command);
+      const { command, data } = message;
+
+      switch (command) {
+        case 'webview.mrDetail':
+          hx.env.openExternal(data);
+          break;
+        case 'webview.toast':
+          toast.error(data);
+          break;
+        default:
+          hx.commands.executeCommand(command);
+          return;
       }
     });
   }

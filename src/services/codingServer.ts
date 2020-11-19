@@ -79,6 +79,20 @@ export default class CodingServer {
     }
   }
 
+  async getMrDetail({ team, project, repo, mergeRequestIId }: IRepoInfo & { mergeRequestIId: number }) {
+    try {
+      const result = await axios({
+        method: 'get',
+        url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merge/${mergeRequestIId}/detail`,
+        headers: this.getHeaders(),
+      });
+
+      return result.data;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async getDepotList(team: string = this._repo?.team, project: string = this._repo?.project) {
     // TODO: 使用新接口
     try {

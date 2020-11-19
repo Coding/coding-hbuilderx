@@ -18,11 +18,21 @@ export function registerCommands(context: IContext) {
   );
 
   context.subscriptions.push(
-    registerCommand('codingPlugin.mrTreeItemClick', function ([team, mrItem]: [string, IMRItem]) {
-      webviewProvider.update({
-        team,
-        ...mrItem,
-      });
+    registerCommand('codingPlugin.mrTreeItemClick', async function ([team, mrItem]: [string, IMRItem]) {
+      const matchRes = mrItem.path.match(/\/p\/([^/]+)\/d\/([^/]+)\/git\/merge\/([0-9]+)/);
+      if (matchRes) {
+        const [, project, repo, mergeRequestIId] = matchRes;
+        const result = await codingServer.getMrDetail({ team, project, repo, mergeRequestIId });
+        webviewProvider.update({
+          session: codingServer.session,
+          mrItem: result,
+          repoInfo: {
+            team,
+            project,
+            repo,
+          },
+        });
+      }
     }),
   );
 
