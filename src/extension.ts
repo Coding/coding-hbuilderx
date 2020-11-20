@@ -1,5 +1,6 @@
 import init from './init';
 import CodingServer from './services/codingServer';
+import WebviewProvider from './webviews';
 import ACTIONS, { dispatch } from './utils/actions';
 import { proxyCtx } from './utils/proxy';
 import toast from './utils/toast';
@@ -26,6 +27,7 @@ const user = {
 
 async function activate(context: IContext) {
   // TODO: 认证，拿到用户信息
+  const webviewProvider = new WebviewProvider();
 
   const repoInfo = await CodingServer.getRepoParams();
   console.log('repoInfo ==> ', repoInfo);
@@ -43,6 +45,7 @@ async function activate(context: IContext) {
   dispatch(ACTIONS.SET_CTX, {
     context,
     value: {
+      webviewProvider,
       codingServer,
       depots: [],
       selectedDepot: null,

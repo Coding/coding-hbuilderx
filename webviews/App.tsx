@@ -180,15 +180,6 @@ const App = () => {
       <div dangerouslySetInnerHTML={{ __html: body }} />
 
       <div className={style.btnGroup}>
-        {showMergeBtn && (
-          <div
-            className={cn(style.btn, style.btnPrimary, isMerging && style.disabled)}
-            onClick={handleMerge}
-          >
-            {renderActionText(isMerging, '合并')}
-          </div>
-        )}
-
         {showAllowMergeBtn && !isAgreed && (
           <div
             className={cn(style.btn, style.btnPrimary, isAllowing && style.disabled)}
@@ -204,6 +195,15 @@ const App = () => {
             onClick={handleDisAllowMerge}
           >
             {renderActionText(isDisAllowing, '撤销允许合并')}
+          </div>
+        )}
+
+        {showMergeBtn && (
+          <div
+            className={cn(style.btn, style.btnPrimary, isMerging && style.disabled)}
+            onClick={handleMerge}
+          >
+            {renderActionText(isMerging, '合并')}
           </div>
         )}
 

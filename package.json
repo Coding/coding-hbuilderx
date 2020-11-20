@@ -14,7 +14,8 @@
   "activationEvents": [
     "onCustomEditor:customEditor.mrDetail",
     "onView:codingPlugin.treeMR",
-    "onView:codingPlugin.treeDepot"
+    "onView:codingPlugin.treeDepot",
+    "onView:codingPlugin.webview"
   ],
   "contributes": {
     "customEditors": [
@@ -61,6 +62,12 @@
           "id": "CODING-DEPOT",
           "title": "CODING 仓库"
         }
+      ],
+      "rightside": [
+        {
+          "id": "WebviewContainerId",
+          "title": "CODING 合并请求详情"
+        }
       ]
     },
     "views": {
@@ -74,6 +81,12 @@
         {
           "id": "codingPlugin.treeDepot",
           "name": "CODING 仓库"
+        }
+      ],
+      "WebviewContainerId": [
+        {
+          "id": "codingPlugin.webview",
+          "title": "CODING 合并请求详情"
         }
       ]
     }

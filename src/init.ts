@@ -5,7 +5,6 @@ import MRCustomEditorProvider from './customEditors/mergeRequest';
 
 import toast from './utils/toast';
 import ACTIONS, { dispatch } from './utils/actions';
-import { openHosts } from './utils/mr';
 import { IDepot, IMRItem } from './typings/common';
 
 const { registerCommand } = hx.commands;
@@ -15,11 +14,10 @@ export function registerCommands(context: IContext) {
 
   context.subscriptions.push(
     registerCommand('codingPlugin.mrTreeItemClick', async function ([team, mrItem]: [string, IMRItem]) {
-      openHosts();
       const matchRes = mrItem.path.match(/\/p\/([^/]+)\/d\/([^/]+)\/git\/merge\/([0-9]+)/);
       if (matchRes) {
         const [, project, repo, mergeRequestIId] = matchRes;
-        context.mrCustomEditor.update({
+        context.webviewProvider.update({
           session: codingServer.session,
           mergeRequestIId,
           repoInfo: {
@@ -47,6 +45,12 @@ export function registerCommands(context: IContext) {
       const depot = await hx.window.showInputBox({
         prompt: '请输入仓库名',
       });
+
+      if (!depot) {
+        toast.warn('仓库名不能为空');
+        return;
+      }
+
       const team = codingServer.session?.user?.team;
       await codingServer.createDepot(team, depot, depot);
       toast.info('仓库创建成功');
@@ -88,7 +92,6 @@ export function clear(context: IContext) {
 
 export function registerCustomEditors(context: IContext) {
   const mrCustomEditor = new MRCustomEditorProvider(context);
-
   hx.window.registerCustomEditorProvider('customEditor.mrDetail', mrCustomEditor);
 
   dispatch(ACTIONS.SET_MR_CUSTOM_EDITOR, {
@@ -100,6 +103,5 @@ export function registerCustomEditors(context: IContext) {
 export default function init(context: IContext) {
   registerCommands(context);
   createTreeViews(context);
-  registerCustomEditors(context);
   workspaceInit();
 }

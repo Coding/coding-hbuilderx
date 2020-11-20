@@ -44,18 +44,29 @@ export default class WebviewProvider {
 
   update(data: any) {
     const webview = this.panel.webView;
-    const fileInfo = hx.Uri.file(path.resolve(__dirname, '../out/webviews/main.js'));
+    const fileInfo = hx.Uri.file(path.resolve(__dirname, '../../out/webviews/main.js'));
+
+    const config = hx.workspace.getConfiguration();
+    const colorScheme = config.get('editor.colorScheme');
+
+    const COLORS: Record<string, string> = {
+      Monokai: 'themeDark',
+      'Atom One Dark': 'themeDarkBlue',
+      Default: 'themeLight',
+    };
 
     webview.html = `
-      <body>
-        <div>
-          <div id='root'></div>
-        </div>
-        <script>
-          window.__CODING__ = '${JSON.stringify(data)}'
-        </script>
-        <script src='${fileInfo}'></script>
-      </body>
+      <html>
+        <body class='${COLORS[colorScheme]}'>
+          <div>
+            <div id='root'></div>
+          </div>
+          <script>
+            window.__CODING__ = '${JSON.stringify(data)}'
+          </script>
+          <script src='${fileInfo}'></script>
+        </body>
+      </html>
     `;
   }
 }
