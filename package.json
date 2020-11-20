@@ -21,9 +21,11 @@
       {
         "viewType": "customEditor.mrDetail",
         "displayName": "MR Detail",
-        "selector": [{
+        "selector": [
+          {
             "fileNamePattern": "hosts"
-        }],
+          }
+        ],
         "priority": "default"
       }
     ],

@@ -26,8 +26,8 @@ export default class MRCustomEditorProvider extends CustomEditorProvider {
     this.panel = null;
   }
 
-  listen() {
-    this.panel.webView.onDidReceiveMessage((message: IMessage) => {
+  listen(webViewPanel: IWebviewPanel) {
+    webViewPanel.webView.onDidReceiveMessage((message: IMessage) => {
       console.log('webview receive message => ', message);
       const { command, data } = message;
 
@@ -44,25 +44,42 @@ export default class MRCustomEditorProvider extends CustomEditorProvider {
       }
     });
 
-    this.panel.onDidDispose(function () {
+    webViewPanel.onDidDispose(function () {
       console.log('custom editor disposed');
     });
   }
 
   update(data: any) {
-    const webview = this.panel.webView;
+    if (!this.panel) {
+      setTimeout(() => {
+        this.update(data);
+      }, 500);
+      return;
+    }
+    const webview = this.panel?.webView;
     const fileInfo = hx.Uri.file(path.resolve(__dirname, '../../out/webviews/main.js'));
 
+    const config = hx.workspace.getConfiguration();
+    const colorScheme = config.get('editor.colorScheme');
+
+    const COLORS: Record<string, string> = {
+      Monokai: 'themeDark',
+      'Atom One Dark': 'themeDarkBlue',
+      Default: 'themeLight',
+    };
+
     webview.html = `
-      <body>
-        <div>
-          <div id='root'></div>
-        </div>
-        <script>
-          window.__CODING__ = '${JSON.stringify(data)}'
-        </script>
-        <script src='${fileInfo}'></script>
-      </body>
+      <html>
+        <body class='${COLORS[colorScheme]}'>
+          <div>
+            <div id='root'></div>
+          </div>
+          <script>
+            window.__CODING__ = '${JSON.stringify(data)}'
+          </script>
+          <script src='${fileInfo}'></script>
+        </body>
+      </html>
     `;
   }
 
@@ -72,7 +89,7 @@ export default class MRCustomEditorProvider extends CustomEditorProvider {
 
   resolveCustomEditor(document: any, webViewPanel: IWebviewPanel) {
     this.panel = webViewPanel;
-    this.listen();
+    this.listen(webViewPanel);
   }
 
   saveCustomDocument(document: any) {

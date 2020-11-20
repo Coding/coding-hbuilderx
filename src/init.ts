@@ -19,10 +19,9 @@ export function registerCommands(context: IContext) {
       const matchRes = mrItem.path.match(/\/p\/([^/]+)\/d\/([^/]+)\/git\/merge\/([0-9]+)/);
       if (matchRes) {
         const [, project, repo, mergeRequestIId] = matchRes;
-        const result = await codingServer.getMrDetail({ team, project, repo, mergeRequestIId });
         context.mrCustomEditor.update({
           session: codingServer.session,
-          mrItem: result,
+          mergeRequestIId,
           repoInfo: {
             team,
             project,

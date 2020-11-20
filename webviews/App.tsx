@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cn from 'classnames';
 
-import { closeMergeRequest, mergeMergeRequest, allowMerge } from './services';
+import {
+  getMergeRequestDetail,
+  closeMergeRequest,
+  mergeMergeRequest,
+  allowMerge,
+  disallowMerge,
+  getReviewers
+} from './services';
 import { MERGE_STATUS_TEXT, MERGE_STATUS } from './constants';
 import style from './style.css';
 
@@ -14,20 +21,58 @@ const toast = (msg: string) => {
 
 const App = () => {
   const data = JSON.parse(window.__CODING__);
-  const { session, mrItem, repoInfo } = data;
+  const { session, repoInfo, mergeRequestIId } = data;
   const { accessToken } = session;
   const user = session?.user;
   const team = user?.team;
 
-  const { can_merge: canMerge, merge_request: mergeRequest } = mrItem;
-  const { title, srcBranch, desBranch, author, merge_status: mergeStatus } = mergeRequest;
-  const url = `https://${team}.coding.net${mergeRequest.path}`;
-
   const [isClosing, setIsClosing] = useState(false);
   const [isMerging, setIsMerging] = useState(false);
   const [isAllowing, setIsAllowing] = useState(false);
-  const [mrStatus, setMrStatus] = useState(mergeStatus);
-  const [allowText, setAllowText] = useState('允许合并');
+  const [isDisAllowing, setIsDisAllowing] = useState(false);
+  const [mrStatus, setMrStatus] = useState<MERGE_STATUS>(MERGE_STATUS.CANMERGE);
+  const [mrDetail, setMrDetail] = useState();
+  const [reviewers, setReviewers] = useState<{ reviewers: any[], volunteer_reviewers: any[] }>({ reviewers: [], volunteer_reviewers: [] });
+
+  const index = reviewers.reviewers.findIndex((r) => r.reviewer.id === user.id);
+  let agreed = true;
+  if (index >= 0) {
+    agreed = reviewers.reviewers[index].value === 100;
+  } else {
+    agreed = reviewers.volunteer_reviewers.findIndex((r) => r.reviewer.id === user.id) >= 0;
+  }
+
+  const [isAgreed, setIsAgreed] = useState(agreed);
+
+  const getParams = () => ({
+    ...repoInfo,
+    mergeRequestIId
+  });
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      const [detailRes, reviewersRes] = await Promise.all([
+        getMergeRequestDetail(accessToken, { ...getParams() }),
+        getReviewers(accessToken, { ...getParams() })
+      ]);
+
+      if (!reviewersRes.code) {
+        setReviewers(reviewersRes.data);
+      }
+
+      if (!detailRes.code) {
+        setMrDetail(detailRes.data);
+        setMrStatus(detailRes.data.merge_request.merge_status);
+      }
+    };
+    asyncFn();
+  }, []);
+
+  if (!mrDetail) return null;
+
+  const { can_merge: canMerge, merge_request: mergeRequest } = mrDetail as any;
+  const { title, srcBranch, desBranch, author, body } = mergeRequest;
+  const url = `https://${team}.coding.net${mergeRequest.path}`;
 
   const viewOnWeb = () => {
     window.hbuilderx.postMessage({
@@ -40,10 +85,7 @@ const App = () => {
     if (isClosing) return;
 
     setIsClosing(true);
-    const result = await closeMergeRequest(accessToken, {
-      ...repoInfo,
-      mergeRequestIId: mergeRequest.iid
-    });
+    const result = await closeMergeRequest(accessToken, { ...getParams() });
 
     if (!result.code) {
       setMrStatus(MERGE_STATUS.REFUSED);
@@ -59,8 +101,7 @@ const App = () => {
 
     setIsMerging(true);
     const result = await mergeMergeRequest(accessToken, {
-      ...repoInfo,
-      mergeRequestIId: mergeRequest.iid,
+      ...getParams(),
       message: `
         Accept Merge Request #${mergeRequest.iid}: (${srcBranch} -> ${desBranch})
         Merge Request: ${title}
@@ -83,18 +124,30 @@ const App = () => {
     if (isAllowing) return;
 
     setIsAllowing(true);
-    const result = await allowMerge(accessToken, {
-      ...repoInfo,
-      mergeRequestIId: mergeRequest.iid
-    });
+    const result = await allowMerge(accessToken, { ...getParams() });
 
     if (!result.code) {
-      setAllowText('已允许');
+      setIsAgreed(true);
     } else {
       toast('操作失败');
     }
 
     setIsAllowing(false);
+  };
+
+  const handleDisAllowMerge = async () => {
+    if (isDisAllowing) return;
+
+    setIsDisAllowing(true);
+    const result = await disallowMerge(accessToken, { ...getParams() });
+
+    if (!result.code) {
+      setIsAgreed(false);
+    } else {
+      toast('操作失败');
+    }
+
+    setIsDisAllowing(false);
   };
 
   const renderStatus = () => {
@@ -105,6 +158,8 @@ const App = () => {
     };
     return <span className={cn(style.status, CNS[mrStatus])}>{MERGE_STATUS_TEXT[mrStatus]}</span>;
   };
+
+  const renderActionText = (loading: boolean, text: string) => loading ? `${text}中...` : text;
 
   const showCloseBtn = (canMerge || user.id === mergeRequest.author.id) && mrStatus !== MERGE_STATUS.REFUSED && mrStatus !== MERGE_STATUS.ACCEPTED;
   const mrStatusOk = mrStatus === MERGE_STATUS.CANMERGE || mrStatus === MERGE_STATUS.CANNOTMERGE;
@@ -121,22 +176,34 @@ const App = () => {
       <div>{`将分支 ${srcBranch} 合并到分支 ${desBranch}`}</div>
       <div>创建人：{author.name}</div>
 
+      <h3>概览：</h3>
+      <div dangerouslySetInnerHTML={{ __html: body }} />
+
       <div className={style.btnGroup}>
         {showMergeBtn && (
           <div
             className={cn(style.btn, style.btnPrimary, isMerging && style.disabled)}
             onClick={handleMerge}
           >
-            {isMerging ? '合并中...' : '合并'}
+            {renderActionText(isMerging, '合并')}
           </div>
         )}
 
-        {showAllowMergeBtn && (
+        {showAllowMergeBtn && !isAgreed && (
           <div
             className={cn(style.btn, style.btnPrimary, isAllowing && style.disabled)}
             onClick={handleAllowMerge}
           >
-            {allowText}
+            {renderActionText(isAllowing, '允许合并')}
+          </div>
+        )}
+
+        {showAllowMergeBtn && isAgreed && (
+          <div
+            className={cn(style.btn, style.btnPrimary, isDisAllowing && style.disabled)}
+            onClick={handleDisAllowMerge}
+          >
+            {renderActionText(isDisAllowing, '撤销允许合并')}
           </div>
         )}
 
@@ -145,7 +212,7 @@ const App = () => {
             className={cn(style.btn, isClosing && style.disabled)}
             onClick={handleClose}
           >
-            {isClosing ? '关闭中...' : '关闭'}
+            {renderActionText(isClosing, '关闭')}
           </div>
         )}
       </div>
