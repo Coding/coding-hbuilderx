@@ -49,8 +49,12 @@ export default class CodingServer {
       const result = await axios({
         method: 'get',
         url: `https://${team}.coding.net/api/current_user`,
-        headers: this.getHeaders(),
+        headers: this.getHeaders(token),
       });
+
+      if (result.code) {
+        return Promise.reject(result);
+      }
 
       return result?.data;
     } catch (err) {

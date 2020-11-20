@@ -64,7 +64,7 @@ export const setConfig = async (prop: string, value: string) => {
   }
 };
 
-export const readToken = async (prop: string) => {
+export const readConfig = async (prop: string) => {
   const codingPlugin = hx.workspace.getConfiguration(`codingPlugin`);
   const token = codingPlugin.get(prop, ``);
   return token;

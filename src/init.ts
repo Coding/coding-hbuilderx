@@ -73,25 +73,6 @@ export function createTreeViews(context: IContext) {
       treeDataProvider: new DepotTreeDataProvider(context),
     }),
   );
-
-  initialize();
-}
-
-async function initialize() {
-  try {
-    let hbToken = await DCloudService.readToken(`hbToken`);
-    console.log(`hb token: ${hbToken}`);
-    if (!hbToken) {
-      const code = await DCloudService.grantForUserInfo();
-      const tokenResult = await DCloudService.applyForToken(code);
-      hbToken = tokenResult.data.access_token;
-    }
-    const resp = await DCloudService.fetchUser(hbToken);
-    console.info(resp);
-    toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
-  } catch (err) {
-    console.error(err);
-  }
 }
 
 export function workspaceInit() {
@@ -110,8 +91,29 @@ export function clear(context: IContext) {
   context.subscriptions.forEach(({ dispose }) => dispose());
 }
 
+async function initCredentials(context: IContext) {
+  try {
+    let hbToken = await DCloudService.readConfig(`hbToken`);
+    if (!hbToken) {
+      const code = await DCloudService.grantForUserInfo();
+      const tokenResult = await DCloudService.applyForToken(code);
+      hbToken = tokenResult.data.access_token;
+    }
+    const resp = await DCloudService.fetchUser(hbToken);
+    toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
+    const {
+      ctx: { codingServer, repoInfo, token },
+    } = context;
+    const userData = await codingServer.getUserInfo(repoInfo.team, token);
+    toast.info(`logged in as coding user: ${userData.name} @ ${userData.team}`);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 export default function init(context: IContext) {
   registerCommands(context);
   createTreeViews(context);
   workspaceInit();
+  initCredentials(context);
 }
