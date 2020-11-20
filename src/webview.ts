@@ -1,6 +1,11 @@
 import hx from 'hbuilderx';
-import fs from 'fs';
 import path from 'path';
+import toast from './utils/toast';
+
+interface IMessage {
+  command: string;
+  data: any;
+}
 
 export default class WebviewProvider {
   panel: IWebviewPanel;
@@ -11,8 +16,21 @@ export default class WebviewProvider {
   }
 
   listen() {
-    this.panel.webView.onDidReceiveMessage((message: any) => {
+    this.panel.webView.onDidReceiveMessage((message: IMessage) => {
       console.log('webview receive message => ', message);
+      const { command, data } = message;
+
+      switch (command) {
+        case 'webview.mrDetail':
+          hx.env.openExternal(data);
+          break;
+        case 'webview.toast':
+          toast.error(data);
+          break;
+        default:
+          hx.commands.executeCommand(command);
+          return;
+      }
     });
   }
 
@@ -24,35 +42,17 @@ export default class WebviewProvider {
     return webviewPanel;
   }
 
-  update(itemId: string) {
+  update(data: any) {
     const webview = this.panel.webView;
     const fileInfo = hx.Uri.file(path.resolve(__dirname, '../out/webviews/main.js'));
 
     webview.html = `
       <body>
-        <div style="max-width:200px;">
+        <div>
           <div id='root'></div>
-          <button onclick="test()">测试</button>
-          <div>${itemId}</div>
         </div>
         <script>
-          window.__TEXT__ = '${itemId}'
-          function test() {
-            alert('abc')
-
-            window.fetch("https://api.github.com/search/repositories?q=react", {
-              "method": "GET",
-              "mode": "cors",
-              "credentials": "include"
-            }).then((res) => {
-              res.json().then(data => alert(JSON.stringify(data.items[0])))
-            })
-          }
-        </script>
-        <script>
-          window.addEventListener("message", (msg) => {
-            console.log(msg);
-          });
+          window.__CODING__ = '${JSON.stringify(data)}'
         </script>
         <script src='${fileInfo}'></script>
       </body>

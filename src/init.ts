@@ -3,7 +3,6 @@ import DepotTreeDataProvider from './trees/depot';
 import MRTreeDataProvider from './trees/mr';
 
 import toast from './utils/toast';
-import { getMRUrl } from './utils/repo';
 import ACTIONS, { dispatch } from './utils/actions';
 import { IDepot, IMRItem } from './typings/common';
 import * as DCloudService from './services/dcloud';
@@ -11,7 +10,7 @@ import * as DCloudService from './services/dcloud';
 const { registerCommand } = hx.commands;
 
 export function registerCommands(context: IContext) {
-  const { codingServer } = context;
+  const { codingServer, webviewProvider } = context;
 
   context.subscriptions.push(
     registerCommand('codingPlugin.helloWorld', () => {
@@ -20,8 +19,21 @@ export function registerCommands(context: IContext) {
   );
 
   context.subscriptions.push(
-    registerCommand('codingPlugin.mrTreeItemClick', function ([team, mrItem]: [string, IMRItem]) {
-      hx.env.openExternal(getMRUrl(team, mrItem));
+    registerCommand('codingPlugin.mrTreeItemClick', async function ([team, mrItem]: [string, IMRItem]) {
+      const matchRes = mrItem.path.match(/\/p\/([^/]+)\/d\/([^/]+)\/git\/merge\/([0-9]+)/);
+      if (matchRes) {
+        const [, project, repo, mergeRequestIId] = matchRes;
+        const result = await codingServer.getMrDetail({ team, project, repo, mergeRequestIId });
+        webviewProvider.update({
+          session: codingServer.session,
+          mrItem: result,
+          repoInfo: {
+            team,
+            project,
+            repo,
+          },
+        });
+      }
     }),
   );
 
@@ -41,8 +53,8 @@ export function registerCommands(context: IContext) {
         prompt: '请输入仓库名',
       });
       const team = codingServer.session?.user?.team;
-      const result = await codingServer.createDepot(team, depot, depot);
-      // TODO: 拉取代码，更新workspace
+      await codingServer.createDepot(team, depot, depot);
+      toast.info('仓库创建成功');
     }),
   );
 }
