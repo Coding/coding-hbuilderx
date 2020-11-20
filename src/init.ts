@@ -6,6 +6,7 @@ import MRCustomEditorProvider from './customEditors/mergeRequest';
 import toast from './utils/toast';
 import ACTIONS, { dispatch } from './utils/actions';
 import { IDepot, IMRItem } from './typings/common';
+import * as DCloudService from './services/dcloud';
 
 const { registerCommand } = hx.commands;
 
@@ -100,8 +101,29 @@ export function registerCustomEditors(context: IContext) {
   });
 }
 
+async function initCredentials(context: IContext) {
+  try {
+    let hbToken = await DCloudService.readConfig(`hbToken`);
+    if (!hbToken) {
+      const code = await DCloudService.grantForUserInfo();
+      const tokenResult = await DCloudService.applyForToken(code);
+      hbToken = tokenResult.data.access_token;
+    }
+    const resp = await DCloudService.fetchUser(hbToken);
+    toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
+    const {
+      ctx: { codingServer, repoInfo, token },
+    } = context;
+    const userData = await codingServer.getUserInfo(repoInfo.team, token);
+    toast.info(`logged in as coding user: ${userData.name} @ ${userData.team}`);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 export default function init(context: IContext) {
   registerCommands(context);
   createTreeViews(context);
   workspaceInit();
+  initCredentials(context);
 }

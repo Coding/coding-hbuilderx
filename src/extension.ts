@@ -4,6 +4,7 @@ import WebviewProvider from './webviews';
 import ACTIONS, { dispatch } from './utils/actions';
 import { proxyCtx } from './utils/proxy';
 import toast from './utils/toast';
+import { readConfig } from './services/dcloud';
 
 // const accessToken = '7e4d9d17f87875e731d536d13635a700ddf52b12';
 // const user = {
@@ -31,6 +32,10 @@ async function activate(context: IContext) {
 
   const repoInfo = await CodingServer.getRepoParams();
   console.log('repoInfo ==> ', repoInfo);
+  const token = await readConfig(`token`);
+  if (!token) {
+    toast.warn(`请先登录 CODING`);
+  }
 
   const codingServer = new CodingServer(
     {
@@ -49,6 +54,8 @@ async function activate(context: IContext) {
       codingServer,
       depots: [],
       selectedDepot: null,
+      token,
+      repoInfo,
     },
   });
 

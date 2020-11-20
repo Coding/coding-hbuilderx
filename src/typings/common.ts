@@ -58,3 +58,36 @@ export interface IDepot {
   svnEnabled: boolean;
   vcsType: 'git' | 'svn';
 }
+
+export interface IOAuthResponse {
+  code: string;
+  error: number;
+}
+
+export interface ITokenResponse {
+  ret: number;
+  desc: string;
+  data: {
+    access_token: string;
+    access_token_ttl: string;
+    refresh_token: string;
+    refresh_token_ttl: string;
+  };
+}
+
+export interface IDCloudUser {
+  ret: number;
+  desc: string;
+  data: {
+    nickname: string;
+    avatar: string;
+    uid: string;
+    email: string;
+    phone: string;
+  };
+}
+
+export enum ITokenType {
+  AccessToken = `accessToken`,
+  RefreshToken = `refreshToken`,
+}
