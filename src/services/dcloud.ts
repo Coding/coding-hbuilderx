@@ -3,8 +3,8 @@ import hx from 'hbuilderx';
 import axios from '../utils/axios';
 import { ITokenResponse, IDCloudUser, ITokenType, IOAuthResponse } from '../typings/common';
 
-const appSecret = `eLEDnBuT258P1OmRx1OVFSCj4SZXom`;
-export const appId = `gZTr3CuevT`;
+const appSecret = `dnGxdvWuEwOO3VimZwo1IsqfESam7k`;
+export const appId = `crvUAM0Snz`;
 
 export const applyForToken = async (code: string | null) => {
   try {

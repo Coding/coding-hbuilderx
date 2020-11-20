@@ -5,7 +5,7 @@ import MRTreeDataProvider from './trees/mr';
 import toast from './utils/toast';
 import { getMRUrl } from './utils/repo';
 import ACTIONS, { dispatch } from './utils/actions';
-import { IDepot, IMRItem, IOAuthResponse, ITokenType } from './typings/common';
+import { IDepot, IMRItem } from './typings/common';
 import * as DCloudService from './services/dcloud';
 
 const { registerCommand } = hx.commands;
