@@ -8,7 +8,6 @@ module.exports = {
     path: path.resolve(__dirname, 'out/webviews'),
     filename: '[name].js',
   },
-  // devtool: 'cheap-module-source-map',
   resolve: {
     extensions: ['.js', '.ts', '.tsx', '.json'],
   },

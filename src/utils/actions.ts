@@ -2,6 +2,7 @@ const enum ACTIONS {
   SET_DEPOTS = 'SET_DEPOTS',
   SET_SELECTED_DEPOT = 'SET_SELECTED_DEPOT',
   SET_CTX = 'SET_CTX',
+  SET_MR_CUSTOM_EDITOR = 'SET_MR_CUSTOM_EDITOR',
 }
 
 interface IPayload {
@@ -19,6 +20,9 @@ export const dispatch = (type: ACTIONS, { context, value }: IPayload) => {
       break;
     case ACTIONS.SET_CTX:
       context.ctx = value;
+      break;
+    case ACTIONS.SET_MR_CUSTOM_EDITOR:
+      context.mrCustomEditor = value;
       break;
     default:
       return;

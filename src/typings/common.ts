@@ -27,6 +27,8 @@ export interface ISessionData {
 
 export interface IReviewer {
   reviewer: IUserInfo;
+  value: number;
+  volunteer: string;
 }
 
 export interface IMRItem {

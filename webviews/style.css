@@ -4,6 +4,21 @@ html, body {
   font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Segoe UI", "Microsoft YaHei", 微软雅黑, sans-serif;
 }
 
+:global(.themeLight) {
+  background-color: #fffae8;
+  color: black;
+}
+
+:global(.themeDark) {
+  background-color: #272822;
+  color: white;
+}
+
+:global(.themeDarkBlue) {
+  background-color: #282c35;
+  color: white;
+}
+
 a {
   cursor: pointer;
   color: #06f;
@@ -19,7 +34,7 @@ a:hover {
 }
 
 .title {
-  margin-top: 20px;
+  margin: 20px 0;
   font-size: 18px;
   font-weight: 600;
 }

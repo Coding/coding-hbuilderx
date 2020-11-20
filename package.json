@@ -12,17 +12,25 @@
   ],
   "main": "./out/extension",
   "activationEvents": [
-    "onCommand:codingPlugin.helloWorld",
+    "onCustomEditor:customEditor.mrDetail",
     "onView:codingPlugin.treeMR",
     "onView:codingPlugin.treeDepot",
     "onView:codingPlugin.webview"
   ],
   "contributes": {
-    "commands": [
+    "customEditors": [
       {
-        "command": "codingPlugin.helloWorld",
-        "title": "Hello World"
-      },
+        "viewType": "customEditor.mrDetail",
+        "displayName": "MR Detail",
+        "selector": [
+          {
+            "fileNamePattern": "hosts"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "commands": [
       {
         "command": "codingPlugin.mrTreeItemClick",
         "title": "Click MR Tree Item"
@@ -37,16 +45,6 @@
       }
     ],
     "menus": {
-      "editor/context": [
-        {
-          "command": "codingPlugin.helloWorld",
-          "group": "z_commands",
-          "when": "editorTextFocus"
-        },
-        {
-          "group": "z_commands"
-        }
-      ],
       "view/item/context": [
         {
           "command": "codingPlugin.createDepot",

@@ -1,6 +1,7 @@
 import hx from 'hbuilderx';
 import DepotTreeDataProvider from './trees/depot';
 import MRTreeDataProvider from './trees/mr';
+import MRCustomEditorProvider from './customEditors/mergeRequest';
 
 import toast from './utils/toast';
 import ACTIONS, { dispatch } from './utils/actions';
@@ -10,23 +11,16 @@ import * as DCloudService from './services/dcloud';
 const { registerCommand } = hx.commands;
 
 export function registerCommands(context: IContext) {
-  const { codingServer, webviewProvider } = context;
-
-  context.subscriptions.push(
-    registerCommand('codingPlugin.helloWorld', () => {
-      toast.info('hello');
-    }),
-  );
+  const { codingServer } = context;
 
   context.subscriptions.push(
     registerCommand('codingPlugin.mrTreeItemClick', async function ([team, mrItem]: [string, IMRItem]) {
       const matchRes = mrItem.path.match(/\/p\/([^/]+)\/d\/([^/]+)\/git\/merge\/([0-9]+)/);
       if (matchRes) {
         const [, project, repo, mergeRequestIId] = matchRes;
-        const result = await codingServer.getMrDetail({ team, project, repo, mergeRequestIId });
-        webviewProvider.update({
+        context.webviewProvider.update({
           session: codingServer.session,
-          mrItem: result,
+          mergeRequestIId,
           repoInfo: {
             team,
             project,
@@ -52,6 +46,12 @@ export function registerCommands(context: IContext) {
       const depot = await hx.window.showInputBox({
         prompt: '请输入仓库名',
       });
+
+      if (!depot) {
+        toast.warn('仓库名不能为空');
+        return;
+      }
+
       const team = codingServer.session?.user?.team;
       await codingServer.createDepot(team, depot, depot);
       toast.info('仓库创建成功');
@@ -89,6 +89,16 @@ export function workspaceInit() {
 
 export function clear(context: IContext) {
   context.subscriptions.forEach(({ dispose }) => dispose());
+}
+
+export function registerCustomEditors(context: IContext) {
+  const mrCustomEditor = new MRCustomEditorProvider(context);
+  hx.window.registerCustomEditorProvider('customEditor.mrDetail', mrCustomEditor);
+
+  dispatch(ACTIONS.SET_MR_CUSTOM_EDITOR, {
+    context,
+    value: mrCustomEditor,
+  });
 }
 
 async function initCredentials(context: IContext) {
