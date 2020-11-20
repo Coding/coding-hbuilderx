@@ -1,9 +1,9 @@
 {
   "name": "coding-hbuilderx",
-  "description": "your extension description",
-  "displayName": "your extension display name",
-  "version": "0.0.0",
-  "publisher": "your name",
+  "description": "",
+  "displayName": "CODING 代码仓库插件",
+  "version": "1.0.0",
+  "publisher": "coding",
   "engines": {
     "HBuilderX": "^2.7.0"
   },
@@ -91,6 +91,25 @@
           "title": "CODING 合并请求详情"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "CODING 代码仓库插件配置",
+      "properties": {
+        "codingPlugin.email": {
+          "type": "string",
+          "description": "CODING 用户邮箱"
+        },
+        "codingPlugin.token": {
+          "type": "string",
+          "description": "CODING 服务令牌，请勿擅自更改"
+        },
+        "codingPlugin.hbToken": {
+          "type": "string",
+          "description": "请勿修改"
+        }
+
+      }
     }
   },
   "extensionDependencies": [
