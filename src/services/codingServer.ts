@@ -8,13 +8,12 @@ import { parseCloneUrl } from '../utils/repo';
 import toast from '../utils/toast';
 
 export default class CodingServer {
-  _session!: ISessionData;
+  _session: ISessionData;
   _repo!: IRepoInfo;
 
-  constructor(session?: ISessionData, repo?: IRepoInfo) {
-    if (session) {
-      this._session = session;
-    }
+  constructor(session: ISessionData, repo?: IRepoInfo) {
+    this._session = session;
+
     if (repo) {
       this._repo = repo;
     }
@@ -44,11 +43,11 @@ export default class CodingServer {
     }
   }
 
-  async getUserInfo(team: string, token: string = this._session?.accessToken || ``) {
+  async getUserInfo(token: string) {
     try {
       const result = await axios({
         method: 'get',
-        url: `https://${team}.coding.net/api/current_user`,
+        url: `https://e.coding.net/api/current_user`,
         headers: this.getHeaders(token),
       });
 

@@ -8,9 +8,11 @@ interface IMessage {
 }
 
 export default class WebviewProvider {
+  context: IContext;
   panel: IWebviewPanel;
 
-  constructor() {
+  constructor(context: IContext) {
+    this.context = context;
     this.panel = this.createPanel();
     this.listen();
   }

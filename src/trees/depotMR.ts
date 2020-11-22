@@ -7,6 +7,7 @@ import { IDepot, IMRItem, IReviewer } from '../typings/common';
 interface IItem extends ITreeItem {
   _create: boolean;
   _auth: boolean;
+  _login: boolean;
   _disabled: boolean;
   _isDepot: boolean;
 }
@@ -15,6 +16,7 @@ type IElement = IDepot & IMRItem & IItem;
 
 const getCommand = (element: IElement) => {
   if (element.children || element._disabled) return '';
+  if (element._login) return 'codingPlugin.login';
   if (element._auth) return 'codingPlugin.auth';
   if (element._create) return 'codingPlugin.createDepot';
   if (element.vcsType) return 'codingPlugin.depotTreeItemClick';
@@ -25,29 +27,35 @@ class DepotMRTreeDataProvider extends hx.TreeDataProvider {
   constructor(context: IContext) {
     super();
     this.context = context;
-  }
-
-  getUser() {
-    return this.context.codingServer.session?.user;
+    this.user = null;
   }
 
   getRepoInfo() {
-    const { selectedDepot, depots, codingServer } = this.context;
-    const user = codingServer.session?.user;
-    return getMrListParams(selectedDepot, depots, user);
+    const { selectedDepot, depots } = this.context;
+    return getMrListParams(selectedDepot, depots, this.user);
   }
 
   async getChildren(element: IElement) {
-    const user = this.getUser();
-    if (!user) {
-      toast.warn('请先绑定 CODING 账户');
+    const { codingServer, token } = this.context;
+
+    if (!this.user) {
+      this.user = await codingServer.getUserInfo(token);
+    }
+
+    if (!this.user) {
       return Promise.resolve([
         {
-          name: '绑定 CODING 账户',
-          _auth: true,
+          name: '登录 CODING',
+          _login: true,
+          _isDepot: true,
         },
       ]);
     }
+
+    dispatch(ACTIONS.SET_USER_INFO, {
+      context: this.context,
+      value: this.user,
+    });
 
     if (element) {
       return Promise.resolve(element.children);
@@ -65,8 +73,10 @@ class DepotMRTreeDataProvider extends hx.TreeDataProvider {
       let reviewerList: IMRItem[] = [];
       let others = [];
       if (list) {
-        createdList = list.filter((item: IMRItem) => item.author.id === user.id);
-        reviewerList = list.filter((item: IMRItem) => item.reviewers.find((r: IReviewer) => r.reviewer.id === user.id));
+        createdList = list.filter((item: IMRItem) => item.author.id === this.user.id);
+        reviewerList = list.filter((item: IMRItem) =>
+          item.reviewers.find((r: IReviewer) => r.reviewer.id === this.user.id),
+        );
         others = list.filter((item: IMRItem) => {
           const isNotInCreatedList = createdList.findIndex((i) => i.id === item.id) === -1;
           const isNotInReviewerList = reviewerList.findIndex((i) => i.id === item.id) === -1;
@@ -91,7 +101,7 @@ class DepotMRTreeDataProvider extends hx.TreeDataProvider {
           _isDepot: true,
         },
         {
-          title: `合并请求列表（当前选中仓库 ${this.context.selectedDepot?.name || '-'}）`,
+          title: `合并请求列表（当前仓库 ${this.context.selectedDepot?.name || '-'}）`,
           children: [
             {
               title: `我创建的 (${createdList?.length})`,
@@ -126,13 +136,12 @@ class DepotMRTreeDataProvider extends hx.TreeDataProvider {
       };
     }
 
-    const user = this.getUser();
     return {
       label: element.title,
       collapsibleState: element.children ? 1 : 0,
       command: {
         command: getCommand(element),
-        arguments: [user?.team, element],
+        arguments: [this.user, element],
       },
     };
   }

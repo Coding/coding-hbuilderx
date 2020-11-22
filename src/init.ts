@@ -6,25 +6,26 @@ import MRCustomEditorProvider from './customEditors/mergeRequest';
 
 import toast from './utils/toast';
 import ACTIONS, { dispatch } from './utils/actions';
-import { IDepot, IMRItem } from './typings/common';
+import { IDepot, IMRItem, IUserInfo } from './typings/common';
 import * as DCloudService from './services/dcloud';
 
 const { registerCommand } = hx.commands;
 const { createTreeView } = hx.window;
 
 export function registerCommands(context: IContext) {
-  const { codingServer } = context;
+  const { codingServer, token } = context;
 
   context.subscriptions.push(
-    registerCommand('codingPlugin.mrTreeItemClick', async function ([team, mrItem]: [string, IMRItem]) {
+    registerCommand('codingPlugin.mrTreeItemClick', async function ([userInfo, mrItem]: [IUserInfo, IMRItem]) {
       const matchRes = mrItem.path.match(/\/p\/([^/]+)\/d\/([^/]+)\/git\/merge\/([0-9]+)/);
       if (matchRes) {
         const [, project, repo, mergeRequestIId] = matchRes;
         context.webviewProvider.update({
-          session: codingServer.session,
+          token,
+          userInfo,
           mergeRequestIId,
           repoInfo: {
-            team,
+            team: userInfo.team,
             project,
             repo,
           },
@@ -54,7 +55,7 @@ export function registerCommands(context: IContext) {
         return;
       }
 
-      const team = codingServer.session?.user?.team;
+      const team = context.userInfo.team;
       const result = await codingServer.createDepot(team, depot, depot);
       if (result) {
         toast.info('仓库创建成功');
@@ -125,7 +126,7 @@ async function initCredentials(context: IContext) {
     const {
       ctx: { codingServer, repoInfo, token },
     } = context;
-    const userData = await codingServer.getUserInfo(repoInfo.team, token);
+    const userData = await codingServer.getUserInfo(token);
     toast.info(`logged in as coding user: ${userData.name} @ ${userData.team}`);
   } catch (err) {
     console.error(err);

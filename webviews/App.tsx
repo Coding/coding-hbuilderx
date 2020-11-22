@@ -26,9 +26,7 @@ const toast = (msg: string) => {
 
 const App = () => {
   const data = JSON.parse(window.__CODING__);
-  const { session, repoInfo, mergeRequestIId } = data;
-  const { accessToken } = session;
-  const user = session?.user;
+  const { token: accessToken, userInfo: user, repoInfo, mergeRequestIId } = data;
   const team = user?.team;
 
   // Fix initialize isAgreed doesn't work
