@@ -47,7 +47,7 @@ a:hover {
 
 .btn {
   margin-right: 10px;
-  padding: 3px 5px;
+  padding: 3px 10px;
   border-radius: 3px;
   border: 1px solid #ccc;
   cursor: pointer;
@@ -82,9 +82,11 @@ a:hover {
 
 .status.success {
   background-color: #bbfada;
+  color: #08934d;
 }
 .status.error {
-  background-color: red;
+  background-color: #fed2d2;
+  color: #ca1628;
 }
 .status.merged {
   background-color: #cceaff;

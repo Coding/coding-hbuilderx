@@ -134,7 +134,9 @@ export default class CodingServer {
 
   async createDepot(team: string, project: string, depot: string) {
     try {
-      await this.createProject(team, project);
+      const projectRes = await this.createProject(team, project);
+
+      if (!projectRes) return;
 
       const result = await axios({
         method: 'post',
@@ -150,6 +152,8 @@ export default class CodingServer {
           shared: false,
         }),
       });
+
+      return result.data;
     } catch (err) {
       console.error(err);
     }

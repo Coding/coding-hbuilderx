@@ -1,6 +1,7 @@
 import hx from 'hbuilderx';
 import DepotTreeDataProvider from './trees/depot';
 import MRTreeDataProvider from './trees/mr';
+import DepotMRTreeDataProvider from './trees/depotMR';
 import MRCustomEditorProvider from './customEditors/mergeRequest';
 
 import toast from './utils/toast';
@@ -9,6 +10,7 @@ import { IDepot, IMRItem } from './typings/common';
 import * as DCloudService from './services/dcloud';
 
 const { registerCommand } = hx.commands;
+const { createTreeView } = hx.window;
 
 export function registerCommands(context: IContext) {
   const { codingServer } = context;
@@ -53,24 +55,33 @@ export function registerCommands(context: IContext) {
       }
 
       const team = codingServer.session?.user?.team;
-      await codingServer.createDepot(team, depot, depot);
-      toast.info('仓库创建成功');
+      const result = await codingServer.createDepot(team, depot, depot);
+      if (result) {
+        toast.info('仓库创建成功');
+      }
     }),
   );
 }
 
 export function createTreeViews(context: IContext) {
   context.subscriptions.push(
-    hx.window.createTreeView('codingPlugin.treeMR', {
+    createTreeView('codingPlugin.treeMR', {
       showCollapseAll: false,
       treeDataProvider: new MRTreeDataProvider(context),
     }),
   );
 
   context.subscriptions.push(
-    hx.window.createTreeView('codingPlugin.treeDepot', {
-      showCollapseAll: true,
+    createTreeView('codingPlugin.treeDepot', {
+      showCollapseAll: false,
       treeDataProvider: new DepotTreeDataProvider(context),
+    }),
+  );
+
+  context.subscriptions.push(
+    createTreeView('codingPlugin.treeDepotMR', {
+      showCollapseAll: false,
+      treeDataProvider: new DepotMRTreeDataProvider(context),
     }),
   );
 }

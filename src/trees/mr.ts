@@ -5,12 +5,10 @@ import { IMRItem, IReviewer } from '../typings/common';
 
 interface IItem extends ITreeItem {
   _disabled: boolean;
-  _create: boolean;
 }
 
 const getCommand = (element: IMRItem & IItem) => {
   if (element.children || element._disabled) return '';
-  if (element._create) return 'codingPlugin.createDepot';
   return 'codingPlugin.mrTreeItemClick';
 };
 
