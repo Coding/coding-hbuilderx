@@ -13,6 +13,7 @@
   "main": "./out/extension",
   "activationEvents": [
     "onCustomEditor:customEditor.mrDetail",
+    "onView:codingPlugin.treeDepotMR",
     "onView:codingPlugin.treeMR",
     "onView:codingPlugin.treeDepot",
     "onView:codingPlugin.webview"
@@ -55,12 +56,8 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "CODING-MR",
-          "title": "CODING 合并请求"
-        },
-        {
-          "id": "CODING-DEPOT",
-          "title": "CODING 仓库"
+          "id": "CODING-DEPOT-MR",
+          "title": "CODING 代码仓库"
         }
       ],
       "rightside": [
@@ -71,16 +68,10 @@
       ]
     },
     "views": {
-      "CODING-MR": [
+      "CODING-DEPOT-MR": [
         {
-          "id": "codingPlugin.treeMR",
-          "name": "CODING 合并请求"
-        }
-      ],
-      "CODING-DEPOT": [
-        {
-          "id": "codingPlugin.treeDepot",
-          "name": "CODING 仓库"
+          "id": "codingPlugin.treeDepotMR",
+          "name": "CODING 代码仓库"
         }
       ],
       "WebviewContainerId": [

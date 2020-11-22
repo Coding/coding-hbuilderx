@@ -8,13 +8,12 @@ import { parseCloneUrl } from '../utils/repo';
 import toast from '../utils/toast';
 
 export default class CodingServer {
-  _session!: ISessionData;
+  _session: ISessionData;
   _repo!: IRepoInfo;
 
-  constructor(session?: ISessionData, repo?: IRepoInfo) {
-    if (session) {
-      this._session = session;
-    }
+  constructor(session: ISessionData, repo?: IRepoInfo) {
+    this._session = session;
+
     if (repo) {
       this._repo = repo;
     }
@@ -32,7 +31,6 @@ export default class CodingServer {
     const folders = await hx.workspace.getWorkspaceFolders();
 
     if (!folders.length) {
-      toast.warn('workspace 中没有目录');
       return;
     }
 
@@ -40,15 +38,15 @@ export default class CodingServer {
       const remotes = await git.listRemotes({ fs, dir: folders[0].uri.path });
       return parseCloneUrl(remotes[0].url);
     } catch {
-      toast.error('该目录没有进行 git 初始化');
+      console.error('该目录没有进行 git 初始化');
     }
   }
 
-  async getUserInfo(team: string, token: string = this._session?.accessToken || ``) {
+  async getUserInfo(token: string) {
     try {
       const result = await axios({
         method: 'get',
-        url: `https://${team}.coding.net/api/current_user`,
+        url: `https://e.coding.net/api/current_user`,
         headers: this.getHeaders(token),
       });
 
@@ -77,6 +75,11 @@ export default class CodingServer {
           sortDirection: `DESC`,
         },
       });
+
+      if (result.code) {
+        return Promise.reject(result);
+      }
+
       return result?.data?.list || [];
     } catch (err) {
       console.error(err);
@@ -91,13 +94,17 @@ export default class CodingServer {
         headers: this.getHeaders(),
       });
 
+      if (result.code) {
+        return Promise.reject(result);
+      }
+
       return result.data;
     } catch (err) {
       console.error(err);
     }
   }
 
-  async getDepotList(team: string = this._repo?.team, project: string = this._repo?.project) {
+  async getDepotList(team: string, project: string = this._repo?.project) {
     // TODO: 使用新接口
     try {
       const result = await axios({
@@ -105,6 +112,10 @@ export default class CodingServer {
         url: `https://${team}.coding.net/api/user/${team}/project/${project}/repos`,
         headers: this.getHeaders(),
       });
+
+      if (result.code) {
+        return Promise.reject(result);
+      }
 
       return result?.data?.depots || [];
     } catch (err) {
@@ -126,6 +137,10 @@ export default class CodingServer {
         },
       });
 
+      if (result.code) {
+        return Promise.reject(result);
+      }
+
       return result.data;
     } catch (err) {
       console.error(err);
@@ -134,7 +149,9 @@ export default class CodingServer {
 
   async createDepot(team: string, project: string, depot: string) {
     try {
-      await this.createProject(team, project);
+      const projectRes = await this.createProject(team, project);
+
+      if (!projectRes) return;
 
       const result = await axios({
         method: 'post',
@@ -150,6 +167,12 @@ export default class CodingServer {
           shared: false,
         }),
       });
+
+      if (result.code) {
+        return Promise.reject(result);
+      }
+
+      return result.data;
     } catch (err) {
       console.error(err);
     }

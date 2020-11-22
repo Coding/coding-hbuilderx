@@ -1,6 +1,7 @@
 const enum ACTIONS {
   SET_DEPOTS = 'SET_DEPOTS',
   SET_SELECTED_DEPOT = 'SET_SELECTED_DEPOT',
+  SET_USER_INFO = 'SET_USER_INFO',
   SET_CTX = 'SET_CTX',
   SET_MR_CUSTOM_EDITOR = 'SET_MR_CUSTOM_EDITOR',
 }
@@ -17,6 +18,9 @@ export const dispatch = (type: ACTIONS, { context, value }: IPayload) => {
       break;
     case ACTIONS.SET_SELECTED_DEPOT:
       context.selectedDepot = value;
+      break;
+    case ACTIONS.SET_USER_INFO:
+      context.userInfo = value;
       break;
     case ACTIONS.SET_CTX:
       context.ctx = value;

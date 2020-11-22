@@ -6,29 +6,9 @@ import { proxyCtx } from './utils/proxy';
 import toast from './utils/toast';
 import { readConfig } from './services/dcloud';
 
-// const accessToken = '7e4d9d17f87875e731d536d13635a700ddf52b12';
-// const user = {
-//   id: 8005956,
-//   avatar: 'https://coding-net-production-static-ci.codehub.cn/WM-TEXT-AVATAR-lvVeBfbGLtCPdcsAOPod.jpg',
-//   global_key: 'PDCOwrBjib',
-//   name: 'uniquemo',
-//   path: '/u/PDCOwrBjib',
-//   team: 'uniquemo',
-// };
-
-const accessToken = '6e15bbb9960810111c90086a6efc07a923dea5a3';
-const user = {
-  id: 8003868,
-  avatar: 'https://coding-net-production-static-ci.codehub.cn/WM-TEXT-AVATAR-lvVeBfbGLtCPdcsAOPod.jpg',
-  global_key: 'dHzOCagiSb',
-  name: '莫泳欣',
-  path: '/u/dHzOCagiSb',
-  team: 'codingcorp',
-};
-
 async function activate(context: IContext) {
   // TODO: 认证，拿到用户信息
-  const webviewProvider = new WebviewProvider();
+  const webviewProvider = new WebviewProvider(context);
 
   const repoInfo = await CodingServer.getRepoParams();
   console.log('repoInfo ==> ', repoInfo);
@@ -39,10 +19,7 @@ async function activate(context: IContext) {
 
   const codingServer = new CodingServer(
     {
-      id: 'abc',
-      user,
-      accessToken,
-      refreshToken: 'abc',
+      accessToken: token,
     },
     repoInfo,
   );
@@ -55,6 +32,7 @@ async function activate(context: IContext) {
       depots: [],
       selectedDepot: null,
       token,
+      userInfo: null,
       repoInfo,
     },
   });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import cn from 'classnames';
 
 import {
@@ -12,6 +12,11 @@ import {
 import { MERGE_STATUS_TEXT, MERGE_STATUS } from './constants';
 import style from './style.css';
 
+interface IReviewers {
+  reviewers: any[];
+  volunteer_reviewers: any[];
+}
+
 const toast = (msg: string) => {
   window.hbuilderx.postMessage({
     command: 'webview.toast',
@@ -21,10 +26,11 @@ const toast = (msg: string) => {
 
 const App = () => {
   const data = JSON.parse(window.__CODING__);
-  const { session, repoInfo, mergeRequestIId } = data;
-  const { accessToken } = session;
-  const user = session?.user;
+  const { token: accessToken, userInfo: user, repoInfo, mergeRequestIId } = data;
   const team = user?.team;
+
+  // Fix initialize isAgreed doesn't work
+  const agreedRef = useRef<boolean>(true);
 
   const [isClosing, setIsClosing] = useState(false);
   const [isMerging, setIsMerging] = useState(false);
@@ -32,17 +38,26 @@ const App = () => {
   const [isDisAllowing, setIsDisAllowing] = useState(false);
   const [mrStatus, setMrStatus] = useState<MERGE_STATUS>(MERGE_STATUS.CANMERGE);
   const [mrDetail, setMrDetail] = useState();
-  const [reviewers, setReviewers] = useState<{ reviewers: any[], volunteer_reviewers: any[] }>({ reviewers: [], volunteer_reviewers: [] });
+  const [reviewers, setReviewers] = useState<IReviewers>({ reviewers: [], volunteer_reviewers: [] });
 
-  const index = reviewers.reviewers.findIndex((r) => r.reviewer.id === user.id);
-  let agreed = true;
-  if (index >= 0) {
-    agreed = reviewers.reviewers[index].value === 100;
-  } else {
-    agreed = reviewers.volunteer_reviewers.findIndex((r) => r.reviewer.id === user.id) >= 0;
-  }
+  const getInitialAgreed = () => {
+    let agreed = true;
+    const index = reviewers.reviewers.findIndex((r) => r.reviewer.id === user.id);
 
-  const [isAgreed, setIsAgreed] = useState(agreed);
+    if (index >= 0) {
+      agreed = reviewers.reviewers[index].value === 100;
+    } else {
+      agreed = reviewers.volunteer_reviewers.findIndex((r) => r.reviewer.id === user.id) >= 0;
+    }
+    return agreed;
+  };
+
+  const [isAgreed, setIsAgreed] = useState(getInitialAgreed());
+
+  const getIsAgreed = () => {
+    if (agreedRef.current) return getInitialAgreed();
+    return isAgreed;
+  };
 
   const getParams = () => ({
     ...repoInfo,
@@ -128,6 +143,7 @@ const App = () => {
 
     if (!result.code) {
       setIsAgreed(true);
+      agreedRef.current = false;
     } else {
       toast('操作失败');
     }
@@ -143,6 +159,7 @@ const App = () => {
 
     if (!result.code) {
       setIsAgreed(false);
+      agreedRef.current = false;
     } else {
       toast('操作失败');
     }
@@ -180,7 +197,7 @@ const App = () => {
       <div dangerouslySetInnerHTML={{ __html: body }} />
 
       <div className={style.btnGroup}>
-        {showAllowMergeBtn && !isAgreed && (
+        {showAllowMergeBtn && !getIsAgreed() && (
           <div
             className={cn(style.btn, style.btnPrimary, isAllowing && style.disabled)}
             onClick={handleAllowMerge}
@@ -189,7 +206,7 @@ const App = () => {
           </div>
         )}
 
-        {showAllowMergeBtn && isAgreed && (
+        {showAllowMergeBtn && getIsAgreed() && (
           <div
             className={cn(style.btn, style.btnPrimary, isDisAllowing && style.disabled)}
             onClick={handleDisAllowMerge}

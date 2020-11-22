@@ -5,12 +5,10 @@ import { IMRItem, IReviewer } from '../typings/common';
 
 interface IItem extends ITreeItem {
   _disabled: boolean;
-  _create: boolean;
 }
 
 const getCommand = (element: IMRItem & IItem) => {
   if (element.children || element._disabled) return '';
-  if (element._create) return 'codingPlugin.createDepot';
   return 'codingPlugin.mrTreeItemClick';
 };
 
@@ -23,7 +21,7 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
   getRepoInfo() {
     const { selectedDepot, depots, codingServer } = this.context;
     const user = codingServer.session?.user;
-    return getMrListParams(selectedDepot, depots, user);
+    return getMrListParams(selectedDepot, user);
   }
 
   getUser() {
@@ -39,7 +37,7 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
       const user = this.getUser();
       const userId = user?.id;
 
-      const repoInfo = this.getRepoInfo();
+      const repoInfo = await this.getRepoInfo();
 
       if (!repoInfo) {
         return Promise.resolve([
@@ -58,7 +56,7 @@ class MRTreeDataProvider extends hx.TreeDataProvider {
 
       return Promise.resolve([
         {
-          title: `当前代码仓库：${repoInfo.repo}`,
+          title: `当前代码仓库：${repoInfo?.repo}`,
           _disabled: true,
         },
         {

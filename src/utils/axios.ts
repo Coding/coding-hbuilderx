@@ -12,7 +12,8 @@ const handleResponse = (response: any) => {
   if (result.code) {
     const message = formatErrorMessage(result.msg);
     toast.error(message);
-    throw new Error(message);
+    console.error(`${response.config.url}：`, result);
+    return result;
   }
 
   return result;

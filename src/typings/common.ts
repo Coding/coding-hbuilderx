@@ -19,10 +19,10 @@ export interface IUserInfo {
 }
 
 export interface ISessionData {
-  id: string;
-  user: IUserInfo | null;
+  id?: string;
+  user?: IUserInfo | null;
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
 }
 
 export interface IReviewer {
