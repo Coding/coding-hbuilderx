@@ -6,6 +6,7 @@ import { IDepot, IMRItem, IReviewer, IRepoInfo } from '../typings/common';
 
 interface IItem extends ITreeItem {
   _create: boolean;
+  _pick: boolean;
   _auth: boolean;
   _login: boolean;
   _disabled: boolean;
@@ -22,10 +23,19 @@ const LOGIN = [
   },
 ];
 
+const AUTH = [
+  {
+    name: 'CODING 授权',
+    _auth: true,
+    _isDepot: true,
+  },
+];
+
 const getCommand = (element: IElement) => {
   if (element.children || element._disabled) return '';
   if (element._login) return 'codingPlugin.login';
   if (element._auth) return 'codingPlugin.auth';
+  if (element._pick) return 'codingPlugin.pickDepot';
   if (element._create) return 'codingPlugin.createDepot';
   if (element.vcsType) return 'codingPlugin.depotTreeItemClick';
   return 'codingPlugin.mrTreeItemClick';
@@ -59,7 +69,7 @@ class DepotMRTreeDataProvider extends hx.TreeDataProvider {
 
   async getData(repoInfo?: IRepoInfo) {
     const { codingServer } = this.context;
-    const promises = [codingServer.getDepotList(this.user.team)];
+    const promises = [codingServer.getDepotList(this.user.team, this.context.repoInfo?.project)];
     if (repoInfo) {
       promises.push(codingServer.getMrList(repoInfo));
     }
@@ -91,7 +101,47 @@ class DepotMRTreeDataProvider extends hx.TreeDataProvider {
     };
   }
 
+  async getMenus(repoInfo?: IRepoInfo) {
+    const {
+      depots,
+      MRList: [createdList, reviewerList, others],
+    } = await this.getData(repoInfo);
+
+    return [
+      {
+        name: '+ 创建仓库',
+        _create: true,
+        _isDepot: true,
+      },
+      {
+        name: `切换仓库（仓库总数：${depots.length}）`,
+        _pick: true,
+        _isDepot: true,
+      },
+      {
+        title: `合并请求列表（当前仓库：${repoInfo?.repo || '-'}）`,
+        _disabled: true,
+      },
+      {
+        title: `我创建的 (${createdList?.length})`,
+        children: createdList,
+      },
+      {
+        title: `需要我 Review 的 (${reviewerList?.length})`,
+        children: reviewerList,
+      },
+      {
+        title: `其他（${others?.length}）`,
+        children: others,
+      },
+    ];
+  }
+
   async getChildren(element: IElement) {
+    if (!this.context.token) {
+      return Promise.resolve(AUTH);
+    }
+
     if (!this.user) {
       try {
         this.user = await this.getUser();
@@ -113,40 +163,8 @@ class DepotMRTreeDataProvider extends hx.TreeDataProvider {
     const repoInfo = await this.getRepoInfo();
 
     try {
-      const {
-        depots,
-        MRList: [createdList, reviewerList, others],
-      } = await this.getData(repoInfo);
-
-      return Promise.resolve([
-        {
-          name: '+ 创建仓库',
-          _create: true,
-          _isDepot: true,
-        },
-        {
-          name: '仓库列表',
-          children: depots,
-          _isDepot: true,
-        },
-        {
-          title: `合并请求列表（当前仓库：${repoInfo?.repo || '-'}）`,
-          children: [
-            {
-              title: `我创建的 (${createdList?.length})`,
-              children: createdList,
-            },
-            {
-              title: `需要我 Review 的 (${reviewerList?.length})`,
-              children: reviewerList,
-            },
-            {
-              title: `其他（${others?.length}）`,
-              children: others,
-            },
-          ],
-        },
-      ]);
+      const menus = await this.getMenus(repoInfo);
+      return Promise.resolve(menus);
     } catch (err) {
       const { code } = err;
       if (code === 1100 || code === 1400) {

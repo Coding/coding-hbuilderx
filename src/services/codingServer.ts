@@ -9,14 +9,9 @@ import toast from '../utils/toast';
 
 export default class CodingServer {
   _session: ISessionData;
-  _repo!: IRepoInfo;
 
-  constructor(session: ISessionData, repo?: IRepoInfo) {
+  constructor(session: ISessionData) {
     this._session = session;
-
-    if (repo) {
-      this._repo = repo;
-    }
   }
 
   get session() {
@@ -104,7 +99,7 @@ export default class CodingServer {
     }
   }
 
-  async getDepotList(team: string, project: string = this._repo?.project) {
+  async getDepotList(team: string, project: string) {
     // TODO: 使用新接口
     try {
       const result = await axios({

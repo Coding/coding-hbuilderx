@@ -24,3 +24,9 @@ interface ITreeItem {
   name?: string;
   children?: ITreeItem[];
 }
+
+interface IQuickPickOption {
+  label: string;
+  description?: string;
+  [key: string]: any;
+}

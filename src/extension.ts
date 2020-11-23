@@ -17,12 +17,9 @@ async function activate(context: IContext) {
     toast.warn(`请先登录 CODING`);
   }
 
-  const codingServer = new CodingServer(
-    {
-      accessToken: token,
-    },
-    repoInfo,
-  );
+  const codingServer = new CodingServer({
+    accessToken: token,
+  });
 
   dispatch(ACTIONS.SET_CTX, {
     context,
@@ -31,6 +28,7 @@ async function activate(context: IContext) {
       codingServer,
       depots: [],
       selectedDepot: null,
+      selectedMR: null,
       token,
       userInfo: null,
       repoInfo,

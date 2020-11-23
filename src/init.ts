@@ -8,15 +8,36 @@ import toast from './utils/toast';
 import ACTIONS, { dispatch } from './utils/actions';
 import { IDepot, IMRItem, IUserInfo } from './typings/common';
 import * as DCloudService from './services/dcloud';
+import CodingServer from './services/codingServer';
 
 const { registerCommand } = hx.commands;
-const { createTreeView } = hx.window;
+const { createTreeView, showQuickPick } = hx.window;
 
 export function registerCommands(context: IContext) {
   const { codingServer, token } = context;
 
   context.subscriptions.push(
+    registerCommand('codingPlugin.pickDepot', async function () {
+      const options: IQuickPickOption[] = [];
+      context.depots.forEach((depot: IDepot) => {
+        options.push({
+          label: depot.name,
+          depot,
+        });
+      });
+
+      const result = await showQuickPick(options);
+      dispatch(ACTIONS.SET_SELECTED_DEPOT, {
+        context,
+        value: result.depot,
+      });
+    }),
+  );
+
+  context.subscriptions.push(
     registerCommand('codingPlugin.mrTreeItemClick', async function ([userInfo, mrItem]: [IUserInfo, IMRItem]) {
+      if (context.selectedMR?.id === mrItem.id) return;
+
       const matchRes = mrItem.path.match(/\/p\/([^/]+)\/d\/([^/]+)\/git\/merge\/([0-9]+)/);
       if (matchRes) {
         const [, project, repo, mergeRequestIId] = matchRes;
@@ -29,6 +50,10 @@ export function registerCommands(context: IContext) {
             project,
             repo,
           },
+        });
+        dispatch(ACTIONS.SET_SELECTED_MR, {
+          context,
+          value: mrItem,
         });
       }
     }),
@@ -58,7 +83,13 @@ export function registerCommands(context: IContext) {
       const team = context.userInfo.team;
       const result = await codingServer.createDepot(team, depot, depot);
       if (result) {
-        toast.info('仓库创建成功');
+        const res = await toast.info('仓库创建成功，是否切换到该仓库？', ['是', '否']);
+        if (res === '是') {
+          dispatch(ACTIONS.SET_SELECTED_DEPOT, {
+            context,
+            value: result,
+          });
+        }
       }
     }),
   );
@@ -87,15 +118,13 @@ export function createTreeViews(context: IContext) {
   );
 }
 
-export function workspaceInit() {
-  hx.workspace.onDidChangeWorkspaceFolders(function (event: any) {
-    if (event.added) {
-      event.added.forEach((item: any) => console.log('新增了项目: ', item.name));
-    }
-
-    if (event.removed) {
-      event.removed.forEach((item: any) => console.log('移除了项目: ', item.name));
-    }
+export function workspaceInit(context: IContext) {
+  hx.workspace.onDidChangeWorkspaceFolders(async function () {
+    const repoInfo = await CodingServer.getRepoParams();
+    dispatch(ACTIONS.SET_REPO_INFO, {
+      context,
+      value: repoInfo,
+    });
   });
 }
 
@@ -136,6 +165,6 @@ async function initCredentials(context: IContext) {
 export default function init(context: IContext) {
   registerCommands(context);
   createTreeViews(context);
-  workspaceInit();
+  workspaceInit(context);
   initCredentials(context);
 }
