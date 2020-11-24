@@ -3,7 +3,7 @@ import fs from 'fs';
 import qs from 'querystring';
 import axios from '../utils/axios';
 import git from 'isomorphic-git';
-import { IRepoInfo, ISessionData } from '../typings/common';
+import { IDepot, IRepoInfo, ISessionData } from '../typings/common';
 import { parseCloneUrl } from '../utils/repo';
 import toast from '../utils/toast';
 
@@ -99,12 +99,11 @@ export default class CodingServer {
     }
   }
 
-  async getDepotList(team: string, project: string) {
-    // TODO: 使用新接口
+  async getDepotList(team: string) {
     try {
       const result = await axios({
         method: 'get',
-        url: `https://${team}.coding.net/api/user/${team}/project/${project}/repos`,
+        url: `https://${team}.coding.net/api/user/${team}/depots`,
         headers: this.getHeaders(),
       });
 
@@ -112,7 +111,8 @@ export default class CodingServer {
         return Promise.reject(result);
       }
 
-      return result?.data?.depots || [];
+      const depots = result?.data || [];
+      return depots.filter((depot: IDepot) => depot.vcsType === 'git');
     } catch (err) {
       console.error(err);
     }

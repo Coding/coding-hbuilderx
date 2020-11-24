@@ -20,8 +20,11 @@ export function registerCommands(context: IContext) {
     registerCommand('codingPlugin.pickDepot', async function () {
       const options: IQuickPickOption[] = [];
       context.depots.forEach((depot: IDepot) => {
+        const { name, depotPath } = depot;
+        const project = depotPath.match(/\/p\/([^/]+)\//)?.[1];
         options.push({
-          label: depot.name,
+          label: name,
+          description: `(project: ${project})`,
           depot,
         });
       });
