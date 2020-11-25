@@ -6,7 +6,9 @@ import git from 'isomorphic-git';
 import { IDepot, IRepoInfo, ISessionData } from '../typings/common';
 import { parseCloneUrl } from '../utils/repo';
 import { getIp } from '../utils/ip';
-import { password } from '../utils/password';
+import { encryptPassword } from '../utils/password';
+import { getEmailPrefix } from '../utils/email';
+import { readConfig } from './dcloud';
 
 export default class CodingServer {
   _session: ISessionData;
@@ -174,24 +176,35 @@ export default class CodingServer {
     }
   }
 
-  async createTeam() {
+  async createTeam(password: string) {
     try {
+      const email = await readConfig(`email`);
       const ip = getIp();
-      const pwd = password('coding123');
+      const pwd = encryptPassword(password);
       console.log('ip => ', ip);
       console.log('pwd => ', pwd);
+      const emailPrefix = getEmailPrefix(email);
+      const teamName = `dcloud-${emailPrefix}-${Date.now()}`;
+
+      console.log('data ===> ', {
+        Action: 'CreateTeam',
+        Domain: teamName,
+        TeamName: teamName,
+        Ip: ip,
+        Password: pwd,
+        Email: email,
+      });
 
       const result = await axios({
         method: 'post',
         url: `https://e.coding.net/open-api`,
         data: {
           Action: 'CreateTeam',
-          Domain: '',
-          TeamName: '',
+          Domain: teamName,
+          TeamName: teamName,
           Ip: ip,
-          Password: '',
-          Phone: '',
-          Email: '',
+          Password: pwd,
+          Email: email,
         },
       });
       console.log('result => ', result);

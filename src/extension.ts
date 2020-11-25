@@ -1,4 +1,4 @@
-import init from './init';
+import initialize from './initialize';
 import CodingServer from './services/codingServer';
 import WebviewProvider from './webviews';
 import ACTIONS, { dispatch } from './utils/actions';
@@ -36,7 +36,7 @@ async function activate(context: IContext) {
   });
 
   proxyCtx(context);
-  init(context);
+  initialize(context);
 }
 
 function deactivate() {

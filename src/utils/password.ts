@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
-export const password = (pwd: string) => {
-  const md5 = crypto.createHash('sha1');
+export const encryptPassword = (pwd: string, encryptMethod = 'sha1') => {
+  const md5 = crypto.createHash(encryptMethod);
   const result = md5.update(pwd).digest('base64');
   return result;
 };
