@@ -70,6 +70,17 @@ export const readConfig = async (prop: string) => {
   return token;
 };
 
+const GRANT_ERROR: Record<string, string> = {
+  1: '当前没有登录用户',
+  2: '用户取消了授权',
+  3: '上一次授权的CODE码还未过期（有效期5分钟）',
+  4: '插件状态异常',
+  1002: '服务器参数错误',
+  2001: '应用信息不存在',
+  3004: '超时',
+  3203: '404',
+};
+
 export const grantForUserInfo = (): Promise<string | null> =>
   new Promise((resolve, reject) => {
     hx.authorize
@@ -78,9 +89,11 @@ export const grantForUserInfo = (): Promise<string | null> =>
         appId: appId,
       })
       .then((param: IOAuthResponse) => {
+        console.log('param => ', param);
         const { code, error } = param;
         if (error || !code) {
-          return reject(null);
+          console.error(`授权出错码 ${error}：${GRANT_ERROR[error]}`);
+          return reject(error);
         }
 
         console.log(`hbuilder oauth code: `, code);

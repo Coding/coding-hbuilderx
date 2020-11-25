@@ -5,7 +5,8 @@ import axios from '../utils/axios';
 import git from 'isomorphic-git';
 import { IDepot, IRepoInfo, ISessionData } from '../typings/common';
 import { parseCloneUrl } from '../utils/repo';
-import toast from '../utils/toast';
+import { getIp } from '../utils/ip';
+import { password } from '../utils/password';
 
 export default class CodingServer {
   _session: ISessionData;
@@ -168,6 +169,32 @@ export default class CodingServer {
       }
 
       return result.data;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async createTeam() {
+    try {
+      const ip = getIp();
+      const pwd = password('coding123');
+      console.log('ip => ', ip);
+      console.log('pwd => ', pwd);
+
+      const result = await axios({
+        method: 'post',
+        url: `https://e.coding.net/open-api`,
+        data: {
+          Action: 'CreateTeam',
+          Domain: '',
+          TeamName: '',
+          Ip: ip,
+          Password: '',
+          Phone: '',
+          Email: '',
+        },
+      });
+      console.log('result => ', result);
     } catch (err) {
       console.error(err);
     }

@@ -10,7 +10,7 @@ import { IDepot, IMRItem, IUserInfo } from './typings/common';
 import * as DCloudService from './services/dcloud';
 import CodingServer from './services/codingServer';
 
-const { registerCommand } = hx.commands;
+const { registerCommand, executeCommand } = hx.commands;
 const { createTreeView, showQuickPick } = hx.window;
 
 export function registerCommands(context: IContext) {
@@ -18,6 +18,10 @@ export function registerCommands(context: IContext) {
 
   context.subscriptions.push(
     registerCommand('codingPlugin.pickDepot', async function () {
+      /////////////// Test
+      context.codingServer.createTeam();
+      executeCommand('codingPlugin.password');
+
       const options: IQuickPickOption[] = [];
       context.depots.forEach((depot: IDepot) => {
         const { name, depotPath } = depot;
@@ -96,6 +100,23 @@ export function registerCommands(context: IContext) {
       }
     }),
   );
+
+  context.subscriptions.push(
+    registerCommand('codingPlugin.auth', async function () {
+      initCredentials(context);
+    }),
+  );
+
+  context.subscriptions.push(
+    registerCommand('codingPlugin.password', async function () {
+      const password = await hx.window.showInputBox({
+        prompt: '配置 CODING 服务密码',
+        password: true,
+      });
+
+      console.log('password => ', password);
+    }),
+  );
 }
 
 export function createTreeViews(context: IContext) {
@@ -148,17 +169,24 @@ export function registerCustomEditors(context: IContext) {
 async function initCredentials(context: IContext) {
   try {
     let hbToken = await DCloudService.readConfig(`hbToken`);
+    console.log('hbToken => ', hbToken);
+
     if (!hbToken) {
       const code = await DCloudService.grantForUserInfo();
       const tokenResult = await DCloudService.applyForToken(code);
+      console.log('tokenResult => ', tokenResult);
       hbToken = tokenResult.data.access_token;
     }
+
     const resp = await DCloudService.fetchUser(hbToken);
+    console.log('resp => ', resp);
     toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
+
     const {
       ctx: { codingServer, repoInfo, token },
     } = context;
     const userData = await codingServer.getUserInfo(token);
+    console.log('userData => ', userData);
     toast.info(`logged in as coding user: ${userData.name} @ ${userData.team}`);
   } catch (err) {
     console.error(err);
