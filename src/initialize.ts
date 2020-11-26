@@ -8,8 +8,8 @@ export function clear(context: IContext) {
 }
 
 export default function initialize(context: IContext) {
+  initCredentials(context);
   registerCommands(context);
   createTreeViews(context);
   initWorkspace(context);
-  initCredentials(context);
 }

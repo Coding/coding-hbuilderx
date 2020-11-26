@@ -5,8 +5,10 @@ import toast from '../utils/toast';
 import ACTIONS, { dispatch } from '../utils/actions';
 import { IDepot, IMRItem, IUserInfo } from '../typings/common';
 
-const { registerCommand } = hx.commands;
+const { registerCommand, executeCommand } = hx.commands;
 const { showQuickPick, showInputBox } = hx.window;
+
+export const refreshTree = () => executeCommand('codingPlugin.refreshTree');
 
 export default function registerCommands(context: IContext) {
   const { codingServer, token } = context;
@@ -29,6 +31,7 @@ export default function registerCommands(context: IContext) {
         context,
         value: result.depot,
       });
+      refreshTree();
     }),
   );
 
@@ -70,7 +73,7 @@ export default function registerCommands(context: IContext) {
 
   context.subscriptions.push(
     registerCommand('codingPlugin.createDepot', async function (param: any) {
-      const depot = await hx.window.showInputBox({
+      const depot = await showInputBox({
         prompt: '请输入仓库名',
       });
 
@@ -89,6 +92,7 @@ export default function registerCommands(context: IContext) {
             value: result,
           });
         }
+        refreshTree();
       }
     }),
   );
@@ -100,36 +104,73 @@ export default function registerCommands(context: IContext) {
   );
 
   context.subscriptions.push(
+    registerCommand('codingPlugin.login', async function () {
+      const newToken = await showInputBox({
+        prompt: '请输入 CODING 个人令牌',
+      });
+
+      if (!newToken) {
+        toast.error(`个人令牌不能为空`);
+        return;
+      }
+
+      try {
+        const userInfo = await codingServer.getUserInfo(newToken);
+        if (userInfo) {
+          dispatch(ACTIONS.SET_TOKEN, {
+            context,
+            value: newToken,
+          });
+          refreshTree();
+        }
+      } catch {
+        toast.error(`个人令牌无效`);
+      }
+    }),
+  );
+
+  context.subscriptions.push(
     registerCommand('codingPlugin.refreshTree', async function () {
       console.log('refresh');
     }),
   );
 
   context.subscriptions.push(
-    registerCommand('codingPlugin.password', async function () {
-      const password1 = await showInputBox({
+    registerCommand('codingPlugin.createTeam', async function () {
+      const password = await showInputBox({
         prompt: '配置 CODING 服务密码',
         password: true,
       });
 
-      if (!password1) {
+      if (!password) {
         toast.error('服务密码不能为空');
         return;
       }
 
-      const password2 = await showInputBox({
+      const repeatPassword = await showInputBox({
         prompt: '再次确认密码',
         password: true,
       });
 
-      if (password1 !== password2) {
+      if (password !== repeatPassword) {
         toast.error('两次输入的密码不一致');
         return;
       }
 
-      // 创建团队
-      const result = await codingServer.createTeam(password1);
-      console.log('create result => ', result);
+      try {
+        const result = await codingServer.createTeam(password);
+        if (result) {
+          toast.info('团队创建成功');
+          dispatch(ACTIONS.SET_TOKEN, {
+            context,
+            value: result.Token,
+          });
+          refreshTree();
+        }
+      } catch (err) {
+        toast.error(`创建团队失败`);
+        console.error(err);
+      }
     }),
   );
 }

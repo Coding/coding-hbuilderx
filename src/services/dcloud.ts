@@ -1,7 +1,7 @@
 import hx from 'hbuilderx';
 
 import axios from '../utils/axios';
-import { ITokenResponse, IDCloudUser, ITokenType, IOAuthResponse } from '../typings/common';
+import { ITokenResponse, IDCloudUser, IOAuthResponse } from '../typings/common';
 
 const appSecret = `dnGxdvWuEwOO3VimZwo1IsqfESam7k`;
 export const appId = `crvUAM0Snz`;
@@ -89,7 +89,6 @@ export const grantForUserInfo = (): Promise<string | null> =>
         appId: appId,
       })
       .then((param: IOAuthResponse) => {
-        console.log('param => ', param);
         const { code, error } = param;
         if (error || !code) {
           console.error(`授权出错码 ${error}：${GRANT_ERROR[error]}`);

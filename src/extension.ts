@@ -7,19 +7,12 @@ import toast from './utils/toast';
 import { readConfig } from './services/dcloud';
 
 async function activate(context: IContext) {
-  // TODO: 认证，拿到用户信息
   const webviewProvider = new WebviewProvider(context);
-
   const repoInfo = await CodingServer.getRepoParams();
-  console.log('repoInfo ==> ', repoInfo);
+  console.log('repoInfo: ', repoInfo);
   const token = await readConfig(`token`);
-  if (!token) {
-    toast.warn(`请先登录 CODING`);
-  }
 
-  const codingServer = new CodingServer({
-    accessToken: token,
-  });
+  const codingServer = new CodingServer(context);
 
   dispatch(ACTIONS.SET_CTX, {
     context,

@@ -1,3 +1,5 @@
+import { setConfig } from '../services/dcloud';
+
 const enum ACTIONS {
   SET_DEPOTS = 'SET_DEPOTS',
   SET_SELECTED_DEPOT = 'SET_SELECTED_DEPOT',
@@ -6,6 +8,7 @@ const enum ACTIONS {
   SET_REPO_INFO = 'SET_REPO_INFO',
   SET_CTX = 'SET_CTX',
   SET_MR_CUSTOM_EDITOR = 'SET_MR_CUSTOM_EDITOR',
+  SET_TOKEN = 'SET_TOKEN',
 }
 
 interface IPayload {
@@ -35,6 +38,10 @@ export const dispatch = (type: ACTIONS, { context, value }: IPayload) => {
       break;
     case ACTIONS.SET_MR_CUSTOM_EDITOR:
       context.mrCustomEditor = value;
+      break;
+    case ACTIONS.SET_TOKEN:
+      context.token = value;
+      setConfig(`token`, value);
       break;
     default:
       return;
