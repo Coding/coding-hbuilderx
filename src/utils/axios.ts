@@ -34,4 +34,10 @@ const createInstance = (): Instance => {
   return instance;
 };
 
+const isProd = true;
+
+export const getApiPrefix = (team = 'e') => {
+  return isProd ? `https://${team}.coding.net` : `http://${team}.staging-corp.coding.io`;
+};
+
 export default createInstance();

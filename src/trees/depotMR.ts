@@ -69,7 +69,7 @@ class DepotMRTreeDataProvider extends hx.TreeDataProvider {
 
   async getData(repoInfo?: IRepoInfo) {
     const { codingServer } = this.context;
-    const promises = [codingServer.getDepotList(this.user.team, this.context.repoInfo?.project)];
+    const promises = [codingServer.getDepotList(this.user.team)];
     if (repoInfo) {
       promises.push(codingServer.getMrList(repoInfo));
     }

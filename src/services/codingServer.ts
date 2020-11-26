@@ -1,25 +1,24 @@
 import hx from 'hbuilderx';
 import fs from 'fs';
 import qs from 'querystring';
-import axios from '../utils/axios';
+import axios, { getApiPrefix } from '../utils/axios';
 import git from 'isomorphic-git';
-import { IRepoInfo, ISessionData } from '../typings/common';
+import { IDepot, IRepoInfo } from '../typings/common';
 import { parseCloneUrl } from '../utils/repo';
-import toast from '../utils/toast';
+import { getIp } from '../utils/ip';
+import { encryptPassword } from '../utils/password';
+import { getEmailPrefix } from '../utils/email';
+import { readConfig } from './dcloud';
 
 export default class CodingServer {
-  _session: ISessionData;
+  context: IContext;
 
-  constructor(session: ISessionData) {
-    this._session = session;
-  }
-
-  get session() {
-    return this._session;
+  constructor(context: IContext) {
+    this.context = context;
   }
 
   getHeaders = (token?: string) => ({
-    Authorization: `token ${token || this._session.accessToken}`,
+    Authorization: `token ${token || this.context.token}`,
   });
 
   static async getRepoParams() {
@@ -41,7 +40,7 @@ export default class CodingServer {
     try {
       const result = await axios({
         method: 'get',
-        url: `https://e.coding.net/api/current_user`,
+        url: `${getApiPrefix()}/api/current_user`,
         headers: this.getHeaders(token),
       });
 
@@ -57,7 +56,7 @@ export default class CodingServer {
 
   async getMrList({ team, project, repo }: IRepoInfo) {
     try {
-      const url = `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
+      const url = `${getApiPrefix(team)}/api/user/${team}/project/${project}/depot/${repo}/git/merges/query`;
       const result = await axios({
         method: 'get',
         url,
@@ -85,7 +84,9 @@ export default class CodingServer {
     try {
       const result = await axios({
         method: 'get',
-        url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}/git/merge/${mergeRequestIId}/detail`,
+        url: `${getApiPrefix(
+          team,
+        )}/api/user/${team}/project/${project}/depot/${repo}/git/merge/${mergeRequestIId}/detail`,
         headers: this.getHeaders(),
       });
 
@@ -99,12 +100,11 @@ export default class CodingServer {
     }
   }
 
-  async getDepotList(team: string, project: string) {
-    // TODO: 使用新接口
+  async getDepotList(team: string) {
     try {
       const result = await axios({
         method: 'get',
-        url: `https://${team}.coding.net/api/user/${team}/project/${project}/repos`,
+        url: `${getApiPrefix(team)}/api/user/${team}/depots`,
         headers: this.getHeaders(),
       });
 
@@ -112,7 +112,8 @@ export default class CodingServer {
         return Promise.reject(result);
       }
 
-      return result?.data?.depots || [];
+      const depots = result?.data || [];
+      return depots.filter((depot: IDepot) => depot.vcsType === 'git');
     } catch (err) {
       console.error(err);
     }
@@ -122,7 +123,7 @@ export default class CodingServer {
     try {
       const result = await axios({
         method: 'post',
-        url: `https://${team}.coding.net/api/team/${team}/template-project`,
+        url: `${getApiPrefix(team)}/api/team/${team}/template-project`,
         headers: this.getHeaders(),
         data: {
           name: project,
@@ -150,7 +151,7 @@ export default class CodingServer {
 
       const result = await axios({
         method: 'post',
-        url: `https://${team}.coding.net/api/user/${team}/project/${project}/depot`,
+        url: `${getApiPrefix(team)}/api/user/${team}/project/${project}/depot`,
         headers: {
           'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
           ...this.getHeaders(),
@@ -168,6 +169,39 @@ export default class CodingServer {
       }
 
       return result.data;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async createTeam(password: string) {
+    try {
+      const email = await readConfig(`email`);
+      const ip = getIp();
+      const pwd = encryptPassword(password);
+      const emailPrefix = getEmailPrefix(email);
+      const randomNum = Math.random().toString().slice(-5);
+      const teamName = `dcloud-${emailPrefix}-${randomNum}`.toLowerCase();
+      console.log('teamName: ', teamName);
+
+      const result = await axios({
+        method: 'post',
+        url: `${getApiPrefix()}/open-api`,
+        data: {
+          Action: 'CreateTeam',
+          Domain: teamName,
+          TeamName: teamName,
+          Ip: ip,
+          Password: pwd,
+          Email: email,
+        },
+      });
+
+      if (result.Response.Error) {
+        return Promise.reject(result);
+      }
+
+      return result.Response.PersonalToken;
     } catch (err) {
       console.error(err);
     }
