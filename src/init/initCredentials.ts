@@ -31,7 +31,7 @@ export async function initCredentials(context: IContext) {
       toast.info(`logged in as CODING user: ${userData.name} @ ${userData.team}`);
     }
   } catch (err) {
-    if (err === 1) {
+    if (Number(err) === 1) {
       toast.warn(`请先登录 DCloud`);
     }
   } finally {

@@ -11,7 +11,7 @@ const { showQuickPick, showInputBox } = hx.window;
 export const refreshTree = () => executeCommand('codingPlugin.refreshTree');
 
 export default function registerCommands(context: IContext) {
-  const { codingServer, token } = context;
+  const { codingServer } = context;
 
   context.subscriptions.push(
     registerCommand('codingPlugin.pickDepot', async function () {
@@ -48,7 +48,7 @@ export default function registerCommands(context: IContext) {
       if (matchRes) {
         const [, project, repo, mergeRequestIId] = matchRes;
         context.webviewProvider.update({
-          token,
+          token: context.token,
           userInfo,
           mergeRequestIId,
           repoInfo: {
