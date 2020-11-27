@@ -17,7 +17,7 @@ export async function initCredentials(context: IContext) {
     }
 
     const resp = await DCloudService.fetchUser(hbToken);
-    toast.info(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
+    console.warn(`logged in as DCloud user: ${resp.data.nickname} ${resp.data.email}`);
 
     if (!token) {
       await executeCommand('codingPlugin.createTeam');

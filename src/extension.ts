@@ -8,11 +8,10 @@ import { readConfig } from './services/dcloud';
 
 async function activate(context: IContext) {
   const webviewProvider = new WebviewProvider(context);
-  const repoInfo = await CodingServer.getRepoParams();
-  console.log('repoInfo: ', repoInfo);
-  const token = await readConfig(`token`);
-
   const codingServer = new CodingServer(context);
+  const repoInfo = await CodingServer.getRepoParams();
+  console.warn('repoInfo: ', repoInfo);
+  const token = await readConfig(`token`);
 
   dispatch(ACTIONS.SET_CTX, {
     context,
