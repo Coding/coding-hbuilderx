@@ -9,6 +9,7 @@ const enum ACTIONS {
   SET_CTX = 'SET_CTX',
   SET_MR_CUSTOM_EDITOR = 'SET_MR_CUSTOM_EDITOR',
   SET_TOKEN = 'SET_TOKEN',
+  SET_WEBVIEW = 'SET_WEBVIEW',
 }
 
 interface IPayload {
@@ -42,6 +43,9 @@ export const dispatch = (type: ACTIONS, { context, value }: IPayload) => {
     case ACTIONS.SET_TOKEN:
       context.token = value;
       setConfig(`token`, value);
+      break;
+    case ACTIONS.SET_WEBVIEW:
+      context.webviewProvider = value;
       break;
     default:
       return;

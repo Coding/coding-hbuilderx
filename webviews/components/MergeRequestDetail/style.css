@@ -1,0 +1,35 @@
+.title {
+  margin: 0 0 20px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  padding: 3px 5px;
+  border-radius: 2px;
+  font-size: 13px;
+  color: black;
+  background-color: #e6e9ed;
+}
+
+.status.success {
+  background-color: #bbfada;
+  color: #08934d;
+}
+.status.error {
+  background-color: #fed2d2;
+  color: #ca1628;
+}
+.status.merged {
+  background-color: #cceaff;
+}
+
+.link {
+  font-size: 14px;
+  font-weight: normal;
+  margin-left: 15px;
+}

@@ -1,13 +1,11 @@
 import initialize from './initialize';
 import CodingServer from './services/codingServer';
-import WebviewProvider from './webviews';
 import ACTIONS, { dispatch } from './utils/actions';
 import { proxyCtx } from './utils/proxy';
 import toast from './utils/toast';
 import { readConfig } from './services/dcloud';
 
 async function activate(context: IContext) {
-  const webviewProvider = new WebviewProvider(context);
   const codingServer = new CodingServer(context);
   const repoInfo = await CodingServer.getRepoParams();
   console.warn('repoInfo: ', repoInfo);
@@ -16,7 +14,7 @@ async function activate(context: IContext) {
   dispatch(ACTIONS.SET_CTX, {
     context,
     value: {
-      webviewProvider,
+      webviewProvider: null,
       codingServer,
       depots: [],
       selectedDepot: null,

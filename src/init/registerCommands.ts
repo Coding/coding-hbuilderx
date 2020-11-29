@@ -72,7 +72,7 @@ export default function registerCommands(context: IContext) {
   );
 
   context.subscriptions.push(
-    registerCommand('codingPlugin.createDepot', async function (param: any) {
+    registerCommand('codingPlugin.createDepot', async function (callback: any) {
       const depot = await showInputBox({
         prompt: '请输入仓库名',
       });
@@ -84,12 +84,21 @@ export default function registerCommands(context: IContext) {
 
       const team = context.userInfo.team;
       const result = await codingServer.createDepot(team, depot, depot);
+      const webview = context.webviewProvider?.panel.webView;
       if (result) {
+        webview.postMessage({
+          command: 'create.depot.success',
+          data: result,
+        });
         const res = await toast.info('仓库创建成功，是否切换到该仓库？', ['是', '否']);
         if (res === '是') {
           dispatch(ACTIONS.SET_SELECTED_DEPOT, {
             context,
             value: result,
+          });
+          webview.postMessage({
+            command: 'create.depot.switch',
+            data: result,
           });
         }
         refreshTree();
@@ -122,6 +131,7 @@ export default function registerCommands(context: IContext) {
             value: newToken,
           });
           refreshTree();
+          context.webviewProvider.refresh();
         }
       } catch {
         toast.error(`个人令牌无效`);
@@ -166,6 +176,7 @@ export default function registerCommands(context: IContext) {
             value: result.Token,
           });
           refreshTree();
+          context.webviewProvider.refresh();
         }
       } catch (err) {
         toast.error(`创建团队失败`);

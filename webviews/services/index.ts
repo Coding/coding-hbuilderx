@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios from '../utils/axios';
 import qs from 'querystring';
 
 interface IRepoInfo {
   team: string;
-  project: string;
-  repo: string;
+  project?: string;
+  repo?: string;
 }
 interface IMergeRequestParams extends IRepoInfo {
   mergeRequestIId: number;
@@ -12,17 +12,46 @@ interface IMergeRequestParams extends IRepoInfo {
 
 interface IMergeMergeRequestParams extends IMergeRequestParams {
   message: string;
-  del_source_branch: boolean;
-  fastforward: boolean;
-  squash: boolean;
 }
 
 const getHeaders = (token: string) => ({
   Authorization: `token ${token}`,
 });
 
-const getBaseUrl = ({ team, project, repo }: IRepoInfo) =>
-  `https://${team}.coding.net/api/user/${team}/project/${project}/depot/${repo}`;
+const getBaseUrl = ({ team, project, repo }: IRepoInfo) => {
+  let url = `https://${team}.coding.net/api/user/${team}`;
+
+  if (project) url += `/project/${project}`;
+  if (repo) url += `/depot/${repo}`;
+  return url;
+};
+
+export const getDepotList = async (token: string, team: string) => {
+  const reuslt = await axios({
+    method: 'get',
+    url: `${getBaseUrl({ team })}/depots`,
+    headers: getHeaders(token)
+  });
+
+  return reuslt.data;
+};
+
+export const getMergeRequestList = async (token: string, { team, project, repo }: IRepoInfo) => {
+  const result = await axios({
+    method: 'get',
+    url: `${getBaseUrl({ team, project, repo })}/git/merges/query`,
+    headers: getHeaders(token),
+    params: {
+      status: `open`,
+      sort: `action_at`,
+      page: 1,
+      PageSize: 100,
+      sortDirection: `DESC`,
+    },
+  });
+
+  return result?.data?.list || [];
+};
 
 export const getMergeRequestDetail = async (token: string, { team, project, repo, mergeRequestIId }: IMergeRequestParams) => {
   const result = await axios({
@@ -31,7 +60,7 @@ export const getMergeRequestDetail = async (token: string, { team, project, repo
     headers: getHeaders(token)
   });
 
-  return result.data;
+  return result;
 };
 
 export const closeMergeRequest = async (token: string, { team, project, repo, mergeRequestIId }: IMergeRequestParams) => {
@@ -41,7 +70,7 @@ export const closeMergeRequest = async (token: string, { team, project, repo, me
     headers: getHeaders(token)
   });
 
-  return result.data;
+  return result;
 };
 
 export const mergeMergeRequest = async (token: string, { team, project, repo, mergeRequestIId, ...others }: IMergeMergeRequestParams) => {
@@ -60,7 +89,7 @@ export const mergeMergeRequest = async (token: string, { team, project, repo, me
     })
   });
 
-  return result.data;
+  return result;
 };
 
 export const allowMerge = async (token: string, { team, project, repo, mergeRequestIId }: IMergeRequestParams) => {
@@ -69,7 +98,7 @@ export const allowMerge = async (token: string, { team, project, repo, mergeRequ
     url: `${getBaseUrl({ team, project, repo })}/git/merge/${mergeRequestIId}/good`,
     headers: getHeaders(token)
   });
-  return result.data;
+  return result;
 };
 
 export const disallowMerge = async (token: string, { team, project, repo, mergeRequestIId }: IMergeRequestParams) => {
@@ -78,7 +107,7 @@ export const disallowMerge = async (token: string, { team, project, repo, mergeR
     url: `${getBaseUrl({ team, project, repo })}/git/merge/${mergeRequestIId}/good`,
     headers: getHeaders(token)
   });
-  return result.data;
+  return result;
 };
 
 export const getReviewers = async (token: string, { team, project, repo, mergeRequestIId }: IMergeRequestParams) => {
@@ -87,5 +116,5 @@ export const getReviewers = async (token: string, { team, project, repo, mergeRe
     url: `${getBaseUrl({ team, project, repo })}/git/merge/${mergeRequestIId}/reviewers`,
     headers: getHeaders(token)
   });
-  return result.data;
+  return result;
 };

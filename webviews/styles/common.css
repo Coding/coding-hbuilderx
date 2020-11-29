@@ -1,0 +1,66 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Segoe UI", "Microsoft YaHei", 微软雅黑, sans-serif;
+}
+
+a {
+  cursor: pointer;
+  color: #06f;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+:global(.themeLight) {
+  background-color: #fffae8;
+  color: black;
+}
+
+:global(.themeDark) {
+  background-color: #272822;
+  color: white;
+}
+
+:global(.themeDarkBlue) {
+  background-color: #282c35;
+  color: white;
+}
+
+:global(.title) {
+  margin: 20px 0 15px;
+  padding-bottom: 5px;
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: 1px solid #ccc;
+}
+
+:global(.btnGroup) {
+  display: flex;
+  align-items: center;
+}
+
+:global(.btn) {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+:global(.btn):hover {
+  opacity: 0.8;
+}
+
+:global(.disabled) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+:global(.btnPrimary) {
+  border: none;
+  background-color: #06f;
+  color: #fff;
+}
