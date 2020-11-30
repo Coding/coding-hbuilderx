@@ -1,0 +1,27 @@
+.root {
+  width: 200px;
+}
+
+.block {
+  margin-bottom: 20px;
+}
+
+.label {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.item {
+  padding: 5px 0;
+  width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.item:hover,
+.item.selected {
+  background-color: #06f;
+  color: #fff;
+}

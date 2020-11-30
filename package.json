@@ -54,30 +54,18 @@
       ]
     },
     "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "CODING-DEPOT-MR",
-          "title": "CODING 代码仓库"
-        }
-      ],
       "rightside": [
         {
           "id": "WebviewContainerId",
-          "title": "CODING 合并请求详情"
+          "title": "CODING 代码仓库"
         }
       ]
     },
     "views": {
-      "CODING-DEPOT-MR": [
-        {
-          "id": "codingPlugin.treeDepotMR",
-          "name": "CODING 代码仓库"
-        }
-      ],
       "WebviewContainerId": [
         {
           "id": "codingPlugin.webview",
-          "title": "CODING 合并请求详情"
+          "title": "CODING 代码仓库"
         }
       ]
     },
@@ -97,7 +85,6 @@
           "type": "string",
           "description": "请勿修改"
         }
-
       }
     }
   },
@@ -128,13 +115,15 @@
     "isomorphic-git": "^1.8.0",
     "querystring": "^0.2.0",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "react-select": "^3.1.1"
   },
   "devDependencies": {
     "@types/classnames": "^2.2.11",
     "@types/node": "^14.14.7",
     "@types/react": "^16.9.56",
     "@types/react-dom": "^16.9.9",
+    "@types/react-select": "^3.0.26",
     "@typescript-eslint/eslint-plugin": "^4.7.0",
     "@typescript-eslint/parser": "^4.7.0",
     "css-loader": "^5.0.1",

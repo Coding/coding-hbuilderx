@@ -1,4 +1,5 @@
 import createTreeViews from './init/createTreeViews';
+import createWebview from './init/createWebview';
 import initWorkspace from './init/initWorkspace';
 import { initCredentials } from './init/initCredentials';
 import registerCommands from './init/registerCommands';
@@ -13,5 +14,6 @@ export default function initialize(context: IContext) {
   initCredentials(context);
   registerCommands(context);
   createTreeViews(context);
+  createWebview(context);
   initWorkspace(context);
 }

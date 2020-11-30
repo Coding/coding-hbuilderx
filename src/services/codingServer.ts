@@ -65,7 +65,7 @@ export default class CodingServer {
           status: `open`,
           sort: `action_at`,
           page: 1,
-          PageSize: 100,
+          PageSize: 1000,
           sortDirection: `DESC`,
         },
       });
@@ -182,7 +182,7 @@ export default class CodingServer {
       const emailPrefix = getEmailPrefix(email);
       const randomNum = Math.random().toString().slice(-5);
       const teamName = `dcloud-${emailPrefix}-${randomNum}`.toLowerCase();
-      console.log('teamName: ', teamName);
+      console.warn('teamName: ', teamName);
 
       const result = await axios({
         method: 'post',

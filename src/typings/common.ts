@@ -4,11 +4,6 @@ export interface IRepoInfo {
   repo: string;
 }
 
-export enum TokenType {
-  AccessToken = `accessToken`,
-  RefreshToken = `refreshToken`,
-}
-
 export interface IUserInfo {
   id: number;
   avatar: string;
@@ -78,9 +73,4 @@ export interface IDCloudUser {
     email: string;
     phone: string;
   };
-}
-
-export enum ITokenType {
-  AccessToken = `accessToken`,
-  RefreshToken = `refreshToken`,
 }

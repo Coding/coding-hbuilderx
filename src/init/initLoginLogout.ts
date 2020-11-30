@@ -7,6 +7,7 @@ export default function initLoginLogout(context: IContext) {
   onUserLogin(() => {
     console.warn('login');
     refreshTree();
+    context.webviewProvider.refresh();
   });
 
   onUserLogout(() => {
