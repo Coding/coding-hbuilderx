@@ -65,7 +65,7 @@ export default class CodingServer {
           status: `open`,
           sort: `action_at`,
           page: 1,
-          PageSize: 100,
+          PageSize: 1000,
           sortDirection: `DESC`,
         },
       });

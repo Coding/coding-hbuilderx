@@ -54,30 +54,18 @@
       ]
     },
     "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "CODING-DEPOT-MR",
-          "title": "CODING 代码仓库"
-        }
-      ],
       "rightside": [
         {
           "id": "WebviewContainerId",
-          "title": "CODING 合并请求详情"
+          "title": "CODING 代码仓库"
         }
       ]
     },
     "views": {
-      "CODING-DEPOT-MR": [
-        {
-          "id": "codingPlugin.treeDepotMR",
-          "name": "CODING 代码仓库"
-        }
-      ],
       "WebviewContainerId": [
         {
           "id": "codingPlugin.webview",
-          "title": "CODING 合并请求详情"
+          "title": "CODING 代码仓库"
         }
       ]
     },
