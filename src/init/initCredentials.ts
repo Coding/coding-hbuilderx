@@ -42,6 +42,5 @@ export async function initCredentials(context: IContext) {
     }
   } finally {
     refreshTree();
-    context.webviewProvider.refresh();
   }
 }
