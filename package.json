@@ -1,6 +1,6 @@
 {
   "name": "coding-hbuilderx",
-  "description": "",
+  "description": "CODING 代码仓库插件，支持查看代码仓库列表、创建代码仓库、查看合并请求列表、合并请求概览以及允许/合并/关闭等操作",
   "displayName": "CODING 代码仓库插件",
   "version": "1.0.0",
   "publisher": "coding",
@@ -94,7 +94,10 @@
   "scripts": {
     "watch": "npm-run-all -p watch:*",
     "watch:extension": "tsc --watch -p ./src",
-    "watch:webviews": "webpack --watch --mode development"
+    "watch:webviews": "webpack --watch",
+    "build": "npm-run-all -p build:*",
+    "build:extension": "tsc -p ./src",
+    "build:webviews": "webpack"
   },
   "husky": {
     "hooks": {
