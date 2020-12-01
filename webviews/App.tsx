@@ -12,7 +12,7 @@ import { auth, login } from './utils/command';
 
 const App = () => {
   const { state, dispatch } = useContext(DataContext);
-  const { token, userInfo } = state;
+  const { token, userInfo, selectedDepot, selectedProjectName } = state;
 
   const handleAuth = () => auth();
   const handleLogin = () => login();
@@ -49,6 +49,15 @@ const App = () => {
     );
   }
 
+  const viewOnWeb = () => {
+    let url = `https://${userInfo.team}.coding.net`;
+    url += selectedDepot ? `/p/${selectedProjectName}/d/${selectedDepot.name}/git` : '';
+    window.hbuilderx.postMessage({
+      command: 'webview.goToPage',
+      data: url
+    });
+  };
+
   return (
     <div className={style.root}>
       {!token ? (
@@ -62,6 +71,7 @@ const App = () => {
             <div className={style.actions}>
               <Actions />
             </div>
+            <a onClick={viewOnWeb}>前往 web 端查看</a>
           </div>
           <div>
             <div className='title'>合并请求</div>

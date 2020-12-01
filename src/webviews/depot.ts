@@ -34,7 +34,7 @@ export default class WebviewProvider {
       const { command, data } = message;
 
       switch (command) {
-        case 'webview.mrDetail':
+        case 'webview.goToPage':
           hx.env.openExternal(data);
           break;
         case 'webview.toast':

@@ -87,7 +87,7 @@ const App = () => {
 
   const viewOnWeb = () => {
     window.hbuilderx.postMessage({
-      command: 'webview.mrDetail',
+      command: 'webview.goToPage',
       data: url
     });
   };
