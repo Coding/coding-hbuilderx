@@ -97,7 +97,8 @@
     "watch:webviews": "webpack --watch",
     "build": "npm-run-all -p build:*",
     "build:extension": "tsc -p ./src",
-    "build:webviews": "webpack"
+    "build:webviews": "webpack",
+    "release": "node ./scripts/release.js"
   },
   "husky": {
     "hooks": {
