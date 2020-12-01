@@ -24,6 +24,7 @@ export default class WebviewProvider {
     this.update({
       token: this.context.token,
       userInfo: this.context.userInfo,
+      repoInfo: this.context.repoInfo,
     });
   }
 

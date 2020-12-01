@@ -40,3 +40,9 @@ export interface IMRItem {
   author: IUserInfo;
   reviewers: IReviewer[];
 }
+
+export interface IRepoInfo {
+  team: string;
+  project: string;
+  repo: string;
+}
