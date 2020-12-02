@@ -40,7 +40,7 @@ const DepotSelect = () => {
 
   const getOptionLabel = ({ name, depotPath }: IDepot) => {
     const project = getDepotProject(depotPath);
-    return name === project ? name : `${name} (${project})`;
+    return `${project}/${name}`;
   };
 
   return (
