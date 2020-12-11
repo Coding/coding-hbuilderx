@@ -222,26 +222,6 @@ export default function registerCommands(context: IContext) {
 
   context.subscriptions.push(
     registerCommand('codingPlugin.createTeam', async function () {
-      // const password = await showInputBox({
-      //   prompt: '配置 CODING 服务密码',
-      //   password: true,
-      // });
-
-      // if (!password) {
-      //   toast.error('服务密码不能为空');
-      //   return;
-      // }
-
-      // const repeatPassword = await showInputBox({
-      //   prompt: '再次确认密码',
-      //   password: true,
-      // });
-
-      // if (password !== repeatPassword) {
-      //   toast.error('两次输入的密码不一致');
-      //   return;
-      // }
-
       try {
         const result = await codingServer.createTeam();
         if (result) {
