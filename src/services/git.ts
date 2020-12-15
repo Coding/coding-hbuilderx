@@ -1,8 +1,9 @@
 import fs from 'fs';
 import git from 'isomorphic-git';
-// import http from 'isomorphic-git/http/node';
 import shell from 'shelljs';
 import { readConfig } from './dcloud';
+
+export const DEFAULT_REMOTE = `origin`;
 
 export const gitListRemotes = async (fsPath: string) => {
   const remotes = await git.listRemotes({ fs, dir: fsPath });
@@ -43,36 +44,30 @@ export const getCurrentBranch = async (fsPath: string) => {
 export const gitPush = async (fsPath: string, callback?: (code: number) => void) => {
   const branch = await getCurrentBranch(fsPath);
   shell.pushd(fsPath);
-  shell.exec(`git push origin ${branch}`, (code) => {
+  shell.exec(`git push ${DEFAULT_REMOTE} ${branch}`, (code) => {
     shell.popd();
     callback && callback(code);
   });
 };
 
-// export const gitPush = async (fsPath: string, url: string) => {
-//   const token = await readConfig('token');
-//   const email = await readConfig('email');
-//   const matchRes = url.match(/^https:\/\/(.+)/);
-//   const result = await git.push({
-//     fs,
-//     http,
-//     dir: fsPath,
-//     remote: 'origin',
-//     ref: 'master',
-//     remoteRef: 'master',
-//     url: `https://${encodeURIComponent(email)}:${token}@${matchRes?.[1]}`,
-//   });
-// };
+export const gitDeleteRemote = async (fsPath: string) => {
+  await git.deleteRemote({
+    fs,
+    dir: fsPath,
+    remote: DEFAULT_REMOTE,
+  });
+};
 
 export const gitAddRemote = async (fsPath: string, url: string) => {
   const token = await readConfig('token');
   const email = await readConfig('email');
-  const matchRes = url.match(/^https:\/\/(.+)/);
+  const matchRes = url.match(/^(https:\/\/|git@)(.*)(e\.coding\.net(\/|:)(.*)\.git)$/i);
+  await gitDeleteRemote(fsPath);
   await git.addRemote({
     fs,
     dir: fsPath,
-    remote: 'origin',
-    url: `https://${encodeURIComponent(email)}:${token}@${matchRes?.[1]}`,
+    remote: DEFAULT_REMOTE,
+    url: `https://${encodeURIComponent(email)}:${token}@${matchRes?.[3]}`,
   });
 };
 

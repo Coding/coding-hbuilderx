@@ -5,21 +5,12 @@
   "version": "1.0.0",
   "publisher": "coding",
   "engines": {
-    "HBuilderX": "^2.7.0"
+    "HBuilderX": "^3.0.0"
   },
   "categories": [
     "Other"
   ],
   "main": "./out/extension",
-  "activationEvents": [
-    "onCustomEditor:customEditor.mrDetail",
-    "onView:codingPlugin.treeDepotMR",
-    "onView:codingPlugin.treeMR",
-    "onView:codingPlugin.treeDepot",
-    "onView:codingPlugin.webview",
-    "onCommand:codingPlugin.connect",
-    "onCommand:codingPlugin.gitPush"
-  ],
   "contributes": {
     "customEditors": [
       {

@@ -6,7 +6,7 @@ import ACTIONS, { dispatch } from '../utils/actions';
 
 const { executeCommand } = hx.commands;
 
-export async function initCredentials(context: IContext) {
+export async function initCredentials(context: IContext, callback?: () => void) {
   try {
     let hbToken = await DCloudService.readConfig(`hbToken`);
     const token = await DCloudService.readConfig(`token`);
@@ -35,6 +35,10 @@ export async function initCredentials(context: IContext) {
         context: context,
         value: userData,
       });
+    }
+
+    if (callback) {
+      callback();
     }
   } catch (err) {
     if (Number(err) === 1) {
