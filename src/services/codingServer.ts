@@ -8,7 +8,7 @@ import { parseCloneUrl } from '../utils/repo';
 import { getIp } from '../utils/ip';
 import { encryptPassword } from '../utils/password';
 import { getEmailPrefix } from '../utils/email';
-import { readConfig } from './dcloud';
+import { readConfig, setConfig } from './dcloud';
 
 export default class CodingServer {
   context: IContext;
@@ -174,11 +174,11 @@ export default class CodingServer {
     }
   }
 
-  async createTeam(password: string) {
+  async createTeam(password?: string) {
     try {
       const email = await readConfig(`email`);
       const ip = getIp();
-      const pwd = encryptPassword(password);
+      const pwd = encryptPassword(password || 'coding12345');
       const emailPrefix = getEmailPrefix(email);
       const randomNum = Math.random().toString().slice(-5);
       const teamName = `dcloud-${emailPrefix}-${randomNum}`.toLowerCase();
@@ -201,6 +201,7 @@ export default class CodingServer {
         return Promise.reject(result);
       }
 
+      await setConfig('team', teamName);
       return result.Response.PersonalToken;
     } catch (err) {
       console.error(err);

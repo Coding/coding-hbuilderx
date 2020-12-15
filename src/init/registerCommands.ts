@@ -1,5 +1,7 @@
 import hx from 'hbuilderx';
 import { initCredentials } from './initCredentials';
+import { readConfig } from '../services/dcloud';
+import { gitListRemotes, gitInit, gitAdd, gitCommit, gitAddRemote, gitPush, gitChanged } from '../services/git';
 
 import toast from '../utils/toast';
 import ACTIONS, { dispatch } from '../utils/actions';
@@ -10,8 +12,99 @@ const { showQuickPick, showInputBox } = hx.window;
 
 export const refreshTree = () => executeCommand('codingPlugin.refreshTree');
 
+interface IWorkspaceFolder {
+  fsPath: string;
+  workspaceFolder: {
+    id: string;
+    metatype: string;
+    name: string;
+  };
+}
+
 export default function registerCommands(context: IContext) {
   const { codingServer } = context;
+
+  context.subscriptions.push(
+    registerCommand(`codingPlugin.gitPush`, async function (param: IWorkspaceFolder) {
+      const executor = async () => {
+        const { fsPath } = param;
+        const changed = await gitChanged(fsPath);
+        if (!changed) {
+          toast.warn(`代码没有变更`);
+          return;
+        }
+        const commitMsg = await showInputBox({
+          prompt: '请输入 git commit 信息',
+        });
+        await gitAdd(fsPath);
+        await gitCommit(fsPath, commitMsg || `feat: update`);
+        await gitPush(fsPath, (code) => {
+          if (code === 0) {
+            toast.info(`提交成功`);
+          } else {
+            toast.error(`操作失败`);
+          }
+        });
+      };
+
+      const token = await readConfig(`token`);
+      if (!token) {
+        await initCredentials(context, () => {
+          executor();
+        });
+        return;
+      }
+
+      executor();
+    }),
+  );
+
+  context.subscriptions.push(
+    registerCommand('codingPlugin.connect', async function (param: IWorkspaceFolder) {
+      const executor = async () => {
+        const {
+          fsPath,
+          workspaceFolder: { name },
+        } = param;
+        const team = context.userInfo.team;
+        const reg = new RegExp(`^(https:\\/\\/|git@)(.*)(e\\.coding\\.net(\\/${team}|:${team})(.*)\\.git)$`, 'i');
+
+        let remotes: any[] = [];
+        try {
+          remotes = await gitListRemotes(fsPath);
+        } catch {
+          await gitInit(fsPath);
+          await gitAdd(fsPath);
+          await gitCommit(fsPath);
+        } finally {
+          const codingRemote = remotes.find((item) => item.url.match(reg));
+          if (codingRemote) {
+            toast.warn(`${name} 已经是 CODING 的代码仓库`);
+          } else {
+            const result = await codingServer.createDepot(team, name, name);
+            await gitAddRemote(fsPath, result.gitHttpsUrl);
+            await gitPush(fsPath, (code) => {
+              if (code === 0) {
+                toast.info(`${name} 托管到 CODING 成功。${result.gitHttpsUrl}`);
+              } else {
+                toast.error(`操作失败`);
+              }
+            });
+          }
+        }
+      };
+
+      const token = await readConfig(`token`);
+      if (!token) {
+        await initCredentials(context, () => {
+          executor();
+        });
+        return;
+      }
+
+      executor();
+    }),
+  );
 
   context.subscriptions.push(
     registerCommand('codingPlugin.pickDepot', async function () {
@@ -147,33 +240,18 @@ export default function registerCommands(context: IContext) {
 
   context.subscriptions.push(
     registerCommand('codingPlugin.createTeam', async function () {
-      const password = await showInputBox({
-        prompt: '配置 CODING 服务密码',
-        password: true,
-      });
-
-      if (!password) {
-        toast.error('服务密码不能为空');
-        return;
-      }
-
-      const repeatPassword = await showInputBox({
-        prompt: '再次确认密码',
-        password: true,
-      });
-
-      if (password !== repeatPassword) {
-        toast.error('两次输入的密码不一致');
-        return;
-      }
-
       try {
-        const result = await codingServer.createTeam(password);
+        const result = await codingServer.createTeam();
         if (result) {
-          toast.info('团队创建成功');
+          toast.info(`团队创建成功，初始密码为 coding12345`);
           dispatch(ACTIONS.SET_TOKEN, {
             context,
             value: result.Token,
+          });
+          const userData = await codingServer.getUserInfo(result.Token);
+          dispatch(ACTIONS.SET_USER_INFO, {
+            context: context,
+            value: userData,
           });
           refreshTree();
           context.webviewProvider.refresh();

@@ -5,19 +5,12 @@
   "version": "1.0.0",
   "publisher": "coding",
   "engines": {
-    "HBuilderX": "^2.7.0"
+    "HBuilderX": "^3.0.0"
   },
   "categories": [
     "Other"
   ],
   "main": "./out/extension",
-  "activationEvents": [
-    "onCustomEditor:customEditor.mrDetail",
-    "onView:codingPlugin.treeDepotMR",
-    "onView:codingPlugin.treeMR",
-    "onView:codingPlugin.treeDepot",
-    "onView:codingPlugin.webview"
-  ],
   "contributes": {
     "customEditors": [
       {
@@ -43,6 +36,14 @@
       {
         "command": "codingPlugin.createDepot",
         "title": "Create Depot"
+      },
+      {
+        "command": "codingPlugin.connect",
+        "title": "将代码托管到 CODING"
+      },
+      {
+        "command": "codingPlugin.gitPush",
+        "title": "提交代码到 CODING"
       }
     ],
     "menus": {
@@ -50,6 +51,24 @@
         {
           "command": "codingPlugin.createDepot",
           "when": "viewItem == 'createDepot'"
+        }
+      ],
+      "explorer/context": [
+        {
+          "id": "CODING",
+          "title": "CODING",
+          "group": "z_commands",
+          "when": "explorerResourceIsWorkspaceFolder == 1"
+        },
+        {
+          "command": "codingPlugin.connect",
+          "title": "将代码托管到 CODING",
+          "group": "CODING@1"
+        },
+        {
+          "command": "codingPlugin.gitPush",
+          "title": "提交代码到 CODING",
+          "group": "CODING@2"
         }
       ]
     },
@@ -84,6 +103,10 @@
         "codingPlugin.hbToken": {
           "type": "string",
           "description": "请勿修改"
+        },
+        "codingPlugin.team": {
+          "type": "string",
+          "description": "CODING 团队名称，请勿修改"
         }
       }
     }
@@ -117,10 +140,12 @@
     "axios": "^0.21.0",
     "classnames": "^2.2.6",
     "isomorphic-git": "^1.8.0",
-    "querystring": "^0.2.0"
+    "querystring": "^0.2.0",
+    "shelljs": "^0.8.4"
   },
   "devDependencies": {
     "@types/node": "^14.14.7",
+    "@types/shelljs": "^0.8.8",
     "@typescript-eslint/eslint-plugin": "^4.7.0",
     "@typescript-eslint/parser": "^4.7.0",
     "css-loader": "^5.0.1",
@@ -129,7 +154,6 @@
     "lint-staged": "^10.5.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
-    "shelljs": "^0.8.4",
     "style-loader": "^2.0.0",
     "ts-loader": "^8.0.11",
     "typescript": "^4.0.5",
